@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "game.h"
 #include <stdio.h>
+#include "parameters.h"
+
 
 float fermi(float point1, float point2) {    
     float prob = 1 / (1 + exp((point1 - point2) / K));

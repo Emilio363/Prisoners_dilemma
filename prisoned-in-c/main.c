@@ -5,11 +5,7 @@
 #include "formulas.h"
 #include "ppm.h"
 #include <math.h>
-
-#define DIM 200
-#define IMAGE_PROPORTION 4
-#define ITERATION 300
-
+#include "parameters.h"
 
 void stampStrategies(int righe, int colonne, Cell_ptr mat[righe][colonne]) {
     printf("\n strategies: \n");
@@ -82,12 +78,17 @@ int main(){
     
     // matrix creation PARALLELIZE
     for(int i = 0; i<DIM; i++){
-        for(int j = 0; j<DIM; j++ ){
+        for(int j = 0; j<DIM/2; j++ ){
             Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
             Cells[i][j]->memory = 0;
             Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = randomStrategy();
-            
+            Cells[i][j]->strategy = cooperate;
+        }
+        for(int j = DIM/2; j<DIM; j++ ){
+            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = defect;
         }
     }
 
@@ -105,7 +106,7 @@ int main(){
             }
         }
 //        double logarithm = log2((double)k); // (int)logarithm ==logarithm
-        if ( k%5 == 0){
+        if ( k%IMAGE_STEP == 0){
             char filename[20];
             printf("stampa");
             sprintf(filename, "%d-image.ppm", k);

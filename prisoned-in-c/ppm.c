@@ -6,6 +6,7 @@
 #include "ppm.h"
 #include "game.h"
 #include "strategy.h"
+#include "parameters.h"
 
 
 int close_image(ppm_ptr img)

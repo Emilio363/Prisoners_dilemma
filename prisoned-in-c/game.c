@@ -4,6 +4,7 @@
 #include "strategy.h"
 #include "formulas.h" // to debug
 #include "sys/types.h"
+#include "parameters.h"
 
 int neighborhoodApply( int (*fun)(Cell_ptr, Cell_ptr),int dimension, Cell_ptr Cells[dimension][dimension] , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset

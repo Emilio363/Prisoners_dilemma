@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <stdlib.h>
+#include "parameters.h"
 
 // ATTENTION: each strategy have to return 'C' or 'D'
 

@@ -8,3 +8,7 @@ prisoned-in-julia/JuliaProgrammingForNervousBeginners
 prisoned-in-julia/Lorem.txt
 
 graph-tool-documentation.pdf
+
+*.ppm
+
+*.o
