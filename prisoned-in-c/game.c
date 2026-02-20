@@ -6,6 +6,29 @@
 #include "sys/types.h"
 #include "parameters.h"
 
+CellMatPtr cellMatCreator(){
+    return (CellMatPtr)malloc(sizeof(CellMat));
+}
+
+CellMatPtr halfMatrixCreator(){
+    CellMatPtr Cells = cellMatCreator();
+    for(int i = 0; i<DIM; i++){
+            for(int j = 0; j<DIM/2; j++ ){
+                Cells->matrix[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+                Cells->matrix[i][j]->memory = 0;
+                Cells->matrix[i][j]->point = 0;
+                Cells->matrix[i][j]->strategy = cooperate;
+            }
+            for(int j = DIM/2; j<DIM; j++ ){
+                Cells->matrix[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+                Cells->matrix[i][j]->memory = 0;
+                Cells->matrix[i][j]->point = 0;
+                Cells->matrix[i][j]->strategy = defect;
+            }
+        }
+    return Cells;
+    }
+
 int neighborhoodApply( int (*fun)(Cell_ptr, Cell_ptr),int dimension, Cell_ptr Cells[dimension][dimension] , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset

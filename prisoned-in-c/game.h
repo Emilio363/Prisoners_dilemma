@@ -10,6 +10,9 @@ struct aCell{
     char (*strategy)();
 };
 
+typedef struct aCell Cell_str;
+typedef struct aCell * Cell_ptr ;
+
 struct CellMatrix
 {
     Cell_ptr matrix[DIM][DIM];
@@ -18,9 +21,11 @@ struct CellMatrix
 };
 
 
-typedef struct aCell Cell_str;
-typedef struct aCell * Cell_ptr ;
 
+typedef struct CellMatrix CellMat;
+typedef struct CellMatrix * CellMatPtr ;
+
+CellMatPtr halfMatrixCreator();
 
 int neighborhoodApply( int (*fun)(Cell_ptr, Cell_ptr),int dimension, Cell_ptr Cells[dimension][dimension] , int row, int col);
 

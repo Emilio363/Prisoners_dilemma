@@ -7,11 +7,16 @@
 #include <math.h>
 #include "parameters.h"
 
-void stampStrategies(int righe, int colonne, Cell_ptr mat[righe][colonne]) {
+void stampStrategies(CellMatPtr matrix) {
+    int righe = sizeof(matrix->matrix)/sizeof(matrix->matrix[0]);
+    int colonne = sizeof(matrix->matrix[0])/sizeof(matrix->matrix[0][0]);
+    
+    Cell_ptr (*mat)[righe][colonne] = &matrix->matrix;
+
     printf("\n strategies: \n");
     for (int i = 0; i < righe; i++) {
         for (int j = 0; j < colonne; j++) {
-            printf("%c ", (mat[i][j]->strategy == cooperate) ? 'C' : 'D');
+            printf("%c ", ((*mat)[i][j]->strategy == cooperate) ? 'C' : 'D');
         }
         printf("\n");
     }
@@ -74,28 +79,17 @@ char (*randomStrategy(void))(void){
 int main(){
     //aggiungi la possibilità di inserire dati particolare tipo:
     // dimensione della matrice, dim dell'imagine ...
-    Cell_ptr Cells[DIM][DIM];
+    // Cell_ptr Cells[DIM][DIM];
+    CellMatPtr Cells = halfMatrixCreator();
     
     // matrix creation PARALLELIZE
-    for(int i = 0; i<DIM; i++){
-        for(int j = 0; j<DIM/2; j++ ){
-            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-            Cells[i][j]->memory = 0;
-            Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = cooperate;
-        }
-        for(int j = DIM/2; j<DIM; j++ ){
-            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-            Cells[i][j]->memory = 0;
-            Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = defect;
-        }
-    }
-
+    stampStrategies(Cells);
+    
+    /*
     for(int k = 0; k < ITERATION; k++){ // number of epoc
         for(int i = 0; i<DIM; i++ ){
             for(int j = 0; j<DIM; j++){
-                Cells[i][j]->point = 0;
+                Cells->matrix[i][j]->point = 0;
                 neighborhoodApply(incrementPoint, DIM, Cells, i, j);
             }
         }
@@ -114,7 +108,7 @@ int main(){
         }
 
 
-    }
+    }*/
 
     return 0;
 }

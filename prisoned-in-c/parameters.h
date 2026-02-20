@@ -1,7 +1,7 @@
 #ifndef _PARAMETERS_H_
 #define _PARAMETERS_H_
 
-#define DIM 200
+#define DIM 20
 #define IMAGE_PROPORTION 4
 #define ITERATION 1000
 #define IMAGE_STEP 50
