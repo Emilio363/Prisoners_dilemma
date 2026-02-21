@@ -19,8 +19,12 @@ struct Param
 };
 
 typedef struct Param Parameters;
-typedef struct Param * ParamPtr ;
+typedef struct Param * ParamPtr;
 
+
+ParamPtr easyParameters();
 ParamPtr standardParameters();
+ParamPtr strongParameters();
+
 
 #endif

@@ -7,6 +7,17 @@
 #include "parameters.h"
 
 int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+                    Cell_ptr ** Cells){
+    for(int i = 0; i<param->dim; i++ ){
+        for(int j = 0; j<param->dim; j++){
+            Cells[i][j]->point = 0;
+            _oneNeighborhoodApply(param, incrementPoint, Cells, i, j);
+        }
+    }
+    return 0;
+}
+
+int _oneNeighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
                     Cell_ptr ** Cells , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
@@ -23,7 +34,17 @@ int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
     return 0;
 }
 
-int oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+int randNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+                    Cell_ptr ** Cells){
+    for(int i = 0; i<param->dim; i++){
+        for(int j = 0; j<param->dim; j++){
+            _oneRandNeighbourApply(param, fun, Cells, i, j);
+        }
+    }
+    return 0;
+}
+
+int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
                     Cell_ptr ** Cells , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
@@ -82,6 +103,32 @@ Cell_ptr ** halfMatrixCreator(ParamPtr param){
             Cells[i][j]->memory = 0;
             Cells[i][j]->point = 0;
             Cells[i][j]->strategy = defect;
+        }
+    }
+    return Cells;
+}
+
+char (*_randomStrategy(void))(void){
+    float num = rand();
+    num = num/RAND_MAX;
+    if(num<0.5){
+        return cooperate;
+    }
+    else{
+        return defect;
+    }
+}
+
+Cell_ptr ** randMatrixCreator(ParamPtr param){
+    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr));
+
+    for(int i = 0; i<param->dim; i++){
+        Cells[i] = (Cell_ptr*) malloc(param->dim * sizeof(Cell_ptr));
+        for(int j = 0; j<param->dim; j++ ){
+            Cells[i][j] = (Cell_str *) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = _randomStrategy();
         }
     }
     return Cells;

@@ -7,6 +7,8 @@
 #include <math.h>
 #include "parameters.h"
 
+
+
 void stampStrategies(ParamPtr param, Cell_ptr mat[param->dim][param->dim]) {
     printf("\n strategies: \n");
     for (int i = 0; i < param->dim; i++) {
@@ -60,44 +62,37 @@ int printMatrix(ParamPtr param, Cell_ptr ** mat, char * image_path){
     return 1;
 }
 
-char (*randomStrategy(void))(void){
-    float num = rand();
-    num = num/RAND_MAX;
-    if(num<0.5){
-        return cooperate;
+void NewPrintMatrix(ParamPtr param, Cell_ptr ** Cells, int k){
+            char filename[25];
+            sprintf(filename, "%d-image.ppm", k);
+            printMatrix(param, Cells, filename);
+}
+
+float evalCoopPercent(ParamPtr param, Cell_ptr ** Cells){
+    float coop_percent = 0;
+    for(int i = 0; i<param->dim; i++){
+        for(int j = 0; j<param->dim; j++ ){
+            //pritnf(Cells[i][j]->strategy == cooperate);
+            if(Cells[i][j]->strategy == cooperate){
+                coop_percent++;
+            }
+        }
     }
-    else{
-        return defect;
-    }
+    return coop_percent/(param->dim*param->dim);
+
 }
 
 int main(){
     ParamPtr param = standardParameters();
-
-    printf("init \n");
-    Cell_ptr ** Cells = halfMatrixCreator(param);
+    Cell_ptr ** Cells = randMatrixCreator(param);
 
     for(int k = 0; k < param->iteration; k++){ // number of epoc
-        for(int i = 0; i<param->dim; i++ ){
-            for(int j = 0; j<param->dim; j++){
-                Cells[i][j]->point = 0;
-                neighborhoodApply(param, incrementPoint, Cells, i, j);
-            }
-        }
-
-        for(int i = 0; i<param->dim; i++){
-            for(int j = 0; j<param->dim; j++){
-                oneRandNeighbourApply(param, changeStrategy, Cells, i, j);
-            }
-        }
-//        double logarithm = log2((double)k); // (int)logarithm ==logarithm
-
+        neighborhoodApply(param, incrementPoint, Cells);
+        randNeighbourApply(param, changeStrategy, Cells);
         if ( k%param->image_step == 0){
-            char filename[25];
-            sprintf(filename, "%d-image.ppm", k);
-            printMatrix(param, Cells, filename);
+            printf("iteration %d, coop percent: %f\n", k, evalCoopPercent(param, Cells));
+            NewPrintMatrix(param, Cells, k);
         }
     }
-
     return 0;
 }
