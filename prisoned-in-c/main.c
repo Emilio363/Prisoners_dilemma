@@ -85,6 +85,11 @@ float evalCoopPercent(ParamPtr param, Cell_ptr ** Cells){
 int main(){
     ParamPtr param = standardParameters();
     Cell_ptr ** Cells = randMatrixCreator(param);
+    int len = param->iteration/param->image_step;
+    double coop_arr[len];
+    double iter_arr[len];
+    
+
 
     for(int k = 0; k < param->iteration; k++){ // number of epoc
         neighborhoodApply(param, incrementPoint, Cells);
@@ -92,7 +97,15 @@ int main(){
         if ( k%param->image_step == 0){
             printf("iteration %d, coop percent: %f\n", k, evalCoopPercent(param, Cells));
             NewPrintMatrix(param, Cells, k);
+            coop_arr[k/param->image_step] = evalCoopPercent(param, Cells);
+            iter_arr[k/param->image_step] = k;
         }
     }
+
+    FILE *fp = fopen("output.csv", "w");
+    for (int i = 0; i < len; i++) {
+        fprintf(fp, "%f,%f\n", iter_arr[i], coop_arr[i]);
+    }
+    fclose(fp);
     return 0;
 }
