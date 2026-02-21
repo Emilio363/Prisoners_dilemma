@@ -3,10 +3,10 @@
 
 ParamPtr standardParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
-    param->dim = 20;
+    param->dim = 200;
     param->image_proportion = 4;
-    param->iteration = 1000;
-    param->image_step = 50;
+    param->iteration = 5000;
+    param->image_step = 500;
 
     param->t = 1.05;
     param->r = 1;

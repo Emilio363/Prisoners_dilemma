@@ -40,7 +40,7 @@ void stamMemory(ParamPtr param, Cell_ptr mat[param->dim][param->dim]) {
     printf("\n");
 }
 
-int printMatrix(ParamPtr param, Cell_ptr mat[param->dim][param->dim], char * image_path){
+int printMatrix(ParamPtr param, Cell_ptr ** mat, char * image_path){
 
     ppm_str destination_image;
     int height = param->dim*param->image_proportion;
@@ -72,25 +72,10 @@ char (*randomStrategy(void))(void){
 }
 
 int main(){
-    //aggiungi la possibilità di inserire dati particolare tipo:
-    // dimensione della matrice, dim dell'imagine ...
     ParamPtr param = standardParameters();
-    Cell_ptr Cells[param->dim][param->dim];
-    // matrix creation PARALLELIZE
-    for(int i = 0; i<param->dim; i++){
-        for(int j = 0; j<param->dim/2; j++ ){
-            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-            Cells[i][j]->memory = 0;
-            Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = cooperate;
-        }
-        for(int j = param->dim/2; j<param->dim; j++ ){
-            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-            Cells[i][j]->memory = 0;
-            Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = defect;
-        }
-    }
+
+    printf("init \n");
+    Cell_ptr ** Cells = halfMatrixCreator(param);
 
     for(int k = 0; k < param->iteration; k++){ // number of epoc
         for(int i = 0; i<param->dim; i++ ){
@@ -106,9 +91,9 @@ int main(){
             }
         }
 //        double logarithm = log2((double)k); // (int)logarithm ==logarithm
+
         if ( k%param->image_step == 0){
             char filename[25];
-            printf("stampa");
             sprintf(filename, "%d-image.ppm", k);
             printMatrix(param, Cells, filename);
         }

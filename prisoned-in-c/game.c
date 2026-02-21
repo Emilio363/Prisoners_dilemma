@@ -6,7 +6,8 @@
 #include "sys/types.h"
 #include "parameters.h"
 
-int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[param->dim][param->dim] , int row, int col){
+int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+                    Cell_ptr ** Cells , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
     
@@ -22,7 +23,8 @@ int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), 
     return 0;
 }
 
-int oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[param->dim][param->dim] , int row, int col){
+int oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+                    Cell_ptr ** Cells , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
     int nrow;
@@ -62,4 +64,25 @@ float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
 // una funzione per trovare il colore della cella
 u_int8_t * colorOfCell(Cell_ptr player){
     return strategyColor(player->strategy);
+}
+
+Cell_ptr ** halfMatrixCreator(ParamPtr param){
+    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr));
+
+    for(int i = 0; i<param->dim; i++){
+        Cells[i] = (Cell_ptr*) malloc(param->dim * sizeof(Cell_ptr));
+        for(int j = 0; j<param->dim/2; j++ ){
+            Cells[i][j] = (Cell_str *) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = cooperate;
+        }
+        for(int j = param->dim/2; j<param->dim; j++ ){
+            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = defect;
+        }
+    }
+    return Cells;
 }
