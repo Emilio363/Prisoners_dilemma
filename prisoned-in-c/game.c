@@ -6,26 +6,7 @@
 #include "sys/types.h"
 #include "parameters.h"
 
-Cell_ptr ** halfMatrixCreator(ParamPtr par){
-    Cell_ptr **Cells = (Cell_ptr **) malloc(par->dim * par->dim * sizeof(Cell_str *));
-    for(int i = 0; i<par->dim; i++){
-            for(int j = 0; j<par->dim/2; j++ ){
-                Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-                Cells[i][j]->memory = 0;
-                Cells[i][j]->point = 0;
-                Cells[i][j]->strategy = cooperate;
-            }
-            for(int j = par->dim/2; j<par->dim; j++ ){
-                Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
-                Cells[i][j]->memory = 0;
-                Cells[i][j]->point = 0;
-                Cells[i][j]->strategy = defect;
-            }
-        }
-    return Cells;
-    }
-
-int neighborhoodApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col){
+int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[param->dim][param->dim] , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
     
@@ -33,15 +14,15 @@ int neighborhoodApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Ce
         int nrow = row + dx[dir];
         int ncol = col + dy[dir];
 
-        if (nrow >= 0 && nrow < par->dim && ncol >= 0 && ncol < par->dim) {
+        if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim) {
             //if (fun == changeStrategy){ printf("try to change strat\n");} // to debug
-            fun(Cells[row][col], Cells[nrow][ncol], par);
+            fun(Cells[row][col], Cells[nrow][ncol], param);
         }
     }
     return 0;
 }
 
-int oneRandNeighbourApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col){
+int oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[param->dim][param->dim] , int row, int col){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
     int nrow;
@@ -51,27 +32,27 @@ int oneRandNeighbourApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr)
         int dir = rand()%4;
         nrow = row + dx[dir];
         ncol = col + dy[dir];
-    }while(!(nrow >= 0 && nrow < par->dim && ncol >= 0 && ncol < par->dim));
-
-    fun(Cells[row][col], Cells[nrow][ncol], par);
+    }while(!(nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim));
+    
+    fun(Cells[row][col], Cells[nrow][ncol], param);
     return 0;
 }
 
-float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr par){
+float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
     char move1 = player1->strategy();
     char move2 = player2->strategy();
 
     if ((move1 == 'C') && (move2 == 'C')) {
-        return par->r;
+        return param->r;
     }
     else if ((move1 == 'C') && (move2 == 'D')) {
-        return par->s;
+        return param->s;
     }
     else if ((move1 == 'D') && (move2 == 'C')) {
-        return par->t;
+        return param->t;
     }
     else if ((move1 == 'D') && (move2 == 'D')) {
-        return par->p;
+        return param->p;
     }
     else {
         return -1;

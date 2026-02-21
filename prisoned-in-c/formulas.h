@@ -1,12 +1,12 @@
 #ifndef _FORMULAS_H_
 #define _FORMULAS_H_
 
-int incrementPoint(Cell_ptr player1, Cell_ptr player2, ParamPtr par);
+int incrementPoint(Cell_ptr player1, Cell_ptr player2, ParamPtr param);
 
-int changeStrategy(Cell_ptr player1, Cell_ptr player2, ParamPtr par);
+int changeStrategy(Cell_ptr player1, Cell_ptr player2, ParamPtr param);
 
-float fermi(float point1, float point2, ParamPtr par);
+float fermi(float point1, float point2, ParamPtr param);
 
-float H_x(int memory, ParamPtr par);
+float H_x(int memory, ParamPtr param);
 
 #endif

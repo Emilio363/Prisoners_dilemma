@@ -7,10 +7,10 @@
 #include <math.h>
 #include "parameters.h"
 
-void stampStrategies(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
+void stampStrategies(ParamPtr param, Cell_ptr mat[param->dim][param->dim]) {
     printf("\n strategies: \n");
-    for (int i = 0; i < par->dim; i++) {
-        for (int j = 0; j < par->dim; j++) {
+    for (int i = 0; i < param->dim; i++) {
+        for (int j = 0; j < param->dim; j++) {
             printf("%c ", (mat[i][j]->strategy == cooperate) ? 'C' : 'D');
         }
         printf("\n");
@@ -18,10 +18,10 @@ void stampStrategies(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
     printf("\n");
 }
 
-void stamPoints(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
+void stamPoints(ParamPtr param, Cell_ptr mat[param->dim][param->dim]) {
     printf("\n points: \n");
-    for (int i = 0; i < par->dim; i++) {
-        for (int j = 0; j < par->dim; j++) {
+    for (int i = 0; i < param->dim; i++) {
+        for (int j = 0; j < param->dim; j++) {
             printf("%f ", mat[i][j]->point);
         }
         printf("\n");
@@ -29,10 +29,10 @@ void stamPoints(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
     printf("\n");
 }
 
-void stamMemory(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
+void stamMemory(ParamPtr param, Cell_ptr mat[param->dim][param->dim]) {
     printf("\n memories \n");
-    for (int i = 0; i < par->dim; i++) {
-        for (int j = 0; j < par->dim; j++) {
+    for (int i = 0; i < param->dim; i++) {
+        for (int j = 0; j < param->dim; j++) {
             printf("%i ", mat[i][j]->memory);
         }
         printf("\n");
@@ -40,11 +40,11 @@ void stamMemory(ParamPtr par, Cell_ptr mat[par->dim][par->dim]) {
     printf("\n");
 }
 
-int printMatrix(ParamPtr par, Cell_ptr matrix[par->dim][par->dim], char * image_path){
+int printMatrix(ParamPtr param, Cell_ptr mat[param->dim][param->dim], char * image_path){
 
     ppm_str destination_image;
-    int height = par->dim*par->image_proportion;
-    int width = par->dim*par->image_proportion;
+    int height = param->dim*param->image_proportion;
+    int width = param->dim*param->image_proportion;
 
     int err3 = createPPM(image_path, height, width, &destination_image);
     if (err3 != 0){
@@ -52,7 +52,7 @@ int printMatrix(ParamPtr par, Cell_ptr matrix[par->dim][par->dim], char * image_
         return -6;
     }
     printf("Dimensione del file= %d\n", (&destination_image)->size);
-    int chec = CellsMatrixinPPM(par->dim, matrix, &destination_image);
+    int chec = CellsMatrixinPPM(param->dim, mat, &destination_image);
     if (chec != 1){
         printf("grande tragedia");
         return -100;
@@ -72,30 +72,45 @@ char (*randomStrategy(void))(void){
 }
 
 int main(){
-    ParamPtr par = standardParameters();
-    Cell_ptr **Cells = halfMatrixCreator(par);
-    printf("work1\n");
-    stampStrategies(par, Cells);
-    
-    for(int k = 0; k < par->iteration; k++){ // number of epoc
-        for(int i = 0; i<par->dim; i++ ){
-            for(int j = 0; j<par->dim; j++){
+    //aggiungi la possibilità di inserire dati particolare tipo:
+    // dimensione della matrice, dim dell'imagine ...
+    ParamPtr param = standardParameters();
+    Cell_ptr Cells[param->dim][param->dim];
+    // matrix creation PARALLELIZE
+    for(int i = 0; i<param->dim; i++){
+        for(int j = 0; j<param->dim/2; j++ ){
+            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = cooperate;
+        }
+        for(int j = param->dim/2; j<param->dim; j++ ){
+            Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
+            Cells[i][j]->memory = 0;
+            Cells[i][j]->point = 0;
+            Cells[i][j]->strategy = defect;
+        }
+    }
+
+    for(int k = 0; k < param->iteration; k++){ // number of epoc
+        for(int i = 0; i<param->dim; i++ ){
+            for(int j = 0; j<param->dim; j++){
                 Cells[i][j]->point = 0;
-                neighborhoodApply(par, incrementPoint, Cells, i, j);
+                neighborhoodApply(param, incrementPoint, Cells, i, j);
             }
         }
 
-        for(int i = 0; i<par->dim; i++){
-            for(int j = 0; j<par->dim; j++){
-                oneRandNeighbourApply(par, changeStrategy, Cells, i, j);
+        for(int i = 0; i<param->dim; i++){
+            for(int j = 0; j<param->dim; j++){
+                oneRandNeighbourApply(param, changeStrategy, Cells, i, j);
             }
         }
 //        double logarithm = log2((double)k); // (int)logarithm ==logarithm
-        if ( k%par->image_step == 0){
+        if ( k%param->image_step == 0){
             char filename[25];
             printf("stampa");
             sprintf(filename, "%d-image.ppm", k);
-            printMatrix(par, Cells, filename);
+            printMatrix(param, Cells, filename);
         }
     }
 

@@ -15,11 +15,15 @@ typedef struct aCell * Cell_ptr ;
 
 Cell_ptr ** halfMatrixCreator(ParamPtr par);
 
-int neighborhoodApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col);
+int neighborhoodApply(ParamPtr param,
+    int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+    Cell_ptr Cells[param->dim][param->dim] , int row, int col);
 
-int oneRandNeighbourApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col);
+int oneRandNeighbourApply(ParamPtr param,
+    int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), 
+    Cell_ptr Cells[param->dim][param->dim] , int row, int col);
 
-float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr par);
+float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param);
 
 u_int8_t * colorOfCell(Cell_ptr player);
 

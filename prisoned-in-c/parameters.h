@@ -1,20 +1,21 @@
 #ifndef _PARAMETERS_H_
 #define _PARAMETERS_H_
 
-struct Param {
+struct Param
+{
     int dim;
-    int image_proportion;
     int iteration;
+    int image_proportion;
     int image_step;
 
-    float t; //1<T<2 il guadagno ottenuto dal aver tradito l'avversario
-    float r; // il guadagno dalla collaborazione
-    float p; //il guadagno dal tradimento reciproco
-    float s; //il guadagno se si viene traditi mentre si collabora
+    double t; //1<T<2 il guadagno ottenuto dal aver tradito l'avversario
+    double r; // il guadagno dalla collaborazione
+    double p; //il guadagno dal tradimento reciproco
+    double s; //il guadagno se si viene traditi mentre si collabora
 
     int max_memory;
-    float k;
-    float beta;
+    double k;
+    double beta;
 };
 
 typedef struct Param Parameters;
