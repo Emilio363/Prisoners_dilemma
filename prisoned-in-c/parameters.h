@@ -1,18 +1,25 @@
 #ifndef _PARAMETERS_H_
 #define _PARAMETERS_H_
 
-#define DIM 20
-#define IMAGE_PROPORTION 4
-#define ITERATION 1000
-#define IMAGE_STEP 50
+struct Param {
+    int dim;
+    int image_proportion;
+    int iteration;
+    int image_step;
 
-#define T 1.05; //1<T<2 il guadagno ottenuto dal aver tradito l'avversario
-#define R 1; // il guadagno dalla collaborazione
-#define P 0; //il guadagno dal tradimento reciproco
-#define S 0; //il guadagno se si viene traditi mentre si collabora
+    float t; //1<T<2 il guadagno ottenuto dal aver tradito l'avversario
+    float r; // il guadagno dalla collaborazione
+    float p; //il guadagno dal tradimento reciproco
+    float s; //il guadagno se si viene traditi mentre si collabora
 
-#define Max_memory 0
-#define K 1.05
-#define beta 0.5
+    int max_memory;
+    float k;
+    float beta;
+};
+
+typedef struct Param Parameters;
+typedef struct Param * ParamPtr ;
+
+ParamPtr standardParameters();
 
 #endif

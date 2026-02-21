@@ -13,25 +13,13 @@ struct aCell{
 typedef struct aCell Cell_str;
 typedef struct aCell * Cell_ptr ;
 
-struct CellMatrix
-{
-    Cell_ptr matrix[DIM][DIM];
-    float proportion;
-    int epoc;
-};
+Cell_ptr ** halfMatrixCreator(ParamPtr par);
 
+int neighborhoodApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col);
 
+int oneRandNeighbourApply(ParamPtr par, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), Cell_ptr Cells[par->dim][par->dim] , int row, int col);
 
-typedef struct CellMatrix CellMat;
-typedef struct CellMatrix * CellMatPtr ;
-
-CellMatPtr halfMatrixCreator();
-
-int neighborhoodApply( int (*fun)(Cell_ptr, Cell_ptr),int dimension, Cell_ptr Cells[dimension][dimension] , int row, int col);
-
-int oneRandNeighbourApply( int (*fun)(Cell_ptr, Cell_ptr),int dimension, Cell_ptr Cells[dimension][dimension] , int row, int col);
-
-float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2);
+float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr par);
 
 u_int8_t * colorOfCell(Cell_ptr player);
 
