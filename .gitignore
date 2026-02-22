@@ -12,3 +12,15 @@ graph-tool-documentation.pdf
 *.ppm
 
 *.o
+
+prisoned-in-c/main
+
+*.png
+
+maybe_traduzione.pdf
+
+prisoned-in-c/small_venv/
+
+*.png
+
+prisoned-in-c/main

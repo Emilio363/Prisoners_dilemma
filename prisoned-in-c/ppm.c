@@ -66,7 +66,7 @@ void _write_color (ppm_ptr img, int row, int col, u_int8_t * colors){
 }
 
 // Funzione che da una matrice di celle crea la corretta immagine PPM
-int CellsMatrixinPPM(int dim, Cell_ptr matrix[dim][dim], ppm_ptr image){
+int CellsMatrixinPPM(int dim, Cell_ptr ** matrix, ppm_ptr image){
     
     int height = image->height;
     int width = image->width;
@@ -104,7 +104,7 @@ u_int8_t * testColor(int col, int row){
 }
 
 // dato un pixel posso calcolare il colore del pixel
-u_int8_t * _pixel_color(int widht, int height, int dim, Cell_ptr Cells[dim][dim], ppm_ptr image){
+u_int8_t * _pixel_color(int widht, int height, int dim, Cell_ptr ** Cells, ppm_ptr image){
     double distw = (double)widht/image->width; 
     // proporzione della distanza del pixel
     // in modo da poterla rapportare con la matrice
