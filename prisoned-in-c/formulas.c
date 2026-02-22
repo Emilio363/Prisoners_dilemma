@@ -5,7 +5,7 @@
 #include "parameters.h"
 
 
-float fermi(float point1, float point2, ParamPtr param) {    
+float fermi(float point1, float point2, ParamPtr param) {
     float prob = 1 / (1 + exp((point1 - point2) / param->k));
     return prob;
 }
@@ -29,9 +29,9 @@ int changeStrategy(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
     float prob = H_x(player1->memory, param)*fermi(player1->point, player2->point, param);
     char (*newstrategy)() = player1->strategy;
     
-    thisrand /= RAND_MAX; // to have a number between 0 and 1
-//    printf(" %f, %f, %i \n", prob, thisrand, myrand); //to debug
-    if (prob < thisrand){
+    thisrand /= RAND_MAX;
+//    printf(" %f, %f, %i \n", prob, thisrand, myrand); //to debugr
+    if (prob > thisrand){
 //        printf("changing strategy\n"); //to debug
         newstrategy = player2->strategy;
     }
