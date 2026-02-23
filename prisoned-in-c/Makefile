@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -O3 -Wall -pedantic -std=c17 -fopenmp
 
-HEADERS = formulas.h game.h strategy.h ppm.h parameters.h
-OBJECTS = formulas.o game.o strategy.o ppm.o parameters.o main.o 
+HEADERS = formulas.h game.h strategy.h ppm.h parameters.h test.h
+OBJECTS = formulas.o game.o strategy.o ppm.o parameters.o tests.o main.o 
 
 all: main
 

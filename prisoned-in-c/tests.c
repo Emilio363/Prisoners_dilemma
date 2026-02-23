@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+#include <math.h>
+#include "strategy.h"
+#include "game.h"
+#include "formulas.h"
+#include "ppm.h"
+#include "parameters.h"
+#include "tests.h"
+#include "main.h"
+
+int temptatioUnparallel(ParamPtr (*parFun)()){
+    int memories[] = {0,1,3,5,7,9};
+    double t_arr[20];
+    for(int i = 0; i<20; i++){
+        t_arr[i] = 1.0 + i*0.025;
+    }
+
+    FILE *fp = fopen("output.csv", "w");
+    for (int m = 0; m < 6; m++) {
+        for (int t_i = 0; t_i < 20; t_i++) {
+
+            ParamPtr param = parFun();
+            param->max_memory = memories[m];
+            param->t = t_arr[t_i];
+            printf("thread %i, memory: %i, Temptation: %f\n", omp_get_thread_num(), param->max_memory, param->t);
+
+            Cell_ptr ** Cells = randMatrixCreator(param);
+            for(int k = 0; k < param->iteration; k++){ // number of epoc
+                neighborhoodApply(param, incrementPoint, Cells);
+                randNeighbourApply(param, changeStrategy, Cells);
+            }
+            printf("percent: %f, memory: %i, Temptation: %f\n", evalCoopPercent(param, Cells), param->max_memory, param->t);
+            
+            fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->max_memory);
+            freeMatrix(Cells, param->dim);
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
+int temptatioParallel(ParamPtr (*parFun)()){
+    int memories[] = {0,1,3,5,7,9};
+    double t_arr[20];
+    for(int i = 0; i<20; i++){
+        t_arr[i] = 1.0 + i*0.025;
+    }
+
+    FILE *fp = fopen("output.csv", "w");
+    #pragma omp parallel for collapse(2)
+    for (int m = 0; m < 6; m++) {
+        for (int t_i = 0; t_i < 20; t_i++) {
+
+            ParamPtr param = parFun();
+            param->max_memory = memories[m];
+            param->t = t_arr[t_i];
+            printf("thread %i, memory: %i, Temptation: %f\n", omp_get_thread_num(), param->max_memory, param->t);
+
+
+            Cell_ptr ** Cells = randMatrixCreator(param);
+            for(int k = 0; k < param->iteration; k++){ // number of epoc
+                neighborhoodApply(param, incrementPoint, Cells);
+                randNeighbourApply(param, changeStrategy, Cells);
+            }
+            printf("percent: %f, memory: %i, Temptation: %f\n", evalCoopPercent(param, Cells), param->max_memory, param->t);
+            #pragma omp critical
+            {
+                fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->max_memory);
+            }
+            freeMatrix(Cells, param->dim);
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
+int memoryRationality(ParamPtr (*parFun)()){
+    int memories[10];
+    double k_arr[3]={0.1, 0.2, 0.3};
+    for(int i = 0; i<10; i++){
+        memories[i] = 10*i;
+    }
+
+    FILE *fp = fopen("output.csv", "w");
+
+    for (int m = 0; m < 10; m++) {
+        for (int t_i = 0; t_i < 3; t_i++) {
+
+            ParamPtr param = parFun();
+            param->max_memory = memories[m];
+            param->k = k_arr[t_i];
+
+            Cell_ptr ** Cells = randMatrixCreator(param);
+            for(int k = 0; k < param->iteration; k++){ // number of epoc
+                neighborhoodApply(param, incrementPoint, Cells);
+                randNeighbourApply(param, changeStrategy, Cells);
+            }
+            //NewPrintMatrix(param, Cells, param->iteration+m*100+t_i*10);
+            printf("%f\n", evalCoopPercent(param, Cells));
+            fprintf(fp, "%i, %f, %f\n", param->max_memory, evalCoopPercent(param, Cells), param->k);
+            freeMatrix(Cells, param->dim);
+        }
+    }
+
+    fclose(fp);
+    return 0;
+}
+
+int debuggingMode(ParamPtr (*parFun)()){
+    ParamPtr param = parFun();
+
+    Cell_ptr ** Cells = randMatrixCreator(param);
+    for(int k = 0; k < 10; k++){ // number of epoc
+        neighborhoodApply(param, incrementPoint, Cells);
+        randNeighbourApply(param, changeStrategy, Cells);
+
+            stampStrategies(param, Cells);
+            stampMemory(param, Cells);
+
+            printf("percernt: %f\n", evalCoopPercent(param, Cells));
+    }
+    //NewPrintMatrix(param, Cells, param->iteration+m*100+t_i*10);
+    printf("final evaluation: %f\n", evalCoopPercent(param, Cells));
+    freeMatrix(Cells, param->dim);
+
+    return 0;
+}
