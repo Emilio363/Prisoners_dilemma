@@ -24,3 +24,5 @@ prisoned-in-c/small_venv/
 *.png
 
 prisoned-in-c/main
+
+*.csv

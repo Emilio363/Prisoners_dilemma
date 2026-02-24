@@ -96,10 +96,12 @@ void freeMatrix(Cell_ptr **Cells, int dim){
 
 int main(){
 
-    ParamPtr (* parameters)() = easyParameters;
+    ParamPtr (* parameters)() = funkyParameters;
 
     float startTime = (float)clock()/3000000;
-    debuggingMode(parameters);
+//    percentSampling1(parameters);
+//    percentSampling2(parameters);
+    betaVariation(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
