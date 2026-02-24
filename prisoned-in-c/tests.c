@@ -17,7 +17,7 @@ int temptatioUnparallel(ParamPtr (*parFun)()){
         t_arr[i] = 1.0 + i*0.025;
     }
 
-    FILE *fp = fopen("output.csv", "w");
+    FILE *fp = fopen("output_temptation.csv", "w");
     for (int m = 0; m < 6; m++) {
         for (int t_i = 0; t_i < 20; t_i++) {
 
@@ -49,7 +49,7 @@ int temptatioParallel(ParamPtr (*parFun)()){
         t_arr[i] = 1.0 + i*0.025;
     }
 
-    FILE *fp = fopen("output.csv", "w");
+    FILE *fp = fopen("output_temptation.csv", "w");
     #pragma omp parallel for collapse(2)
     for (int m = 0; m < 6; m++) {
         for (int t_i = 0; t_i < 20; t_i++) {
@@ -85,7 +85,7 @@ int memoryRationality(ParamPtr (*parFun)()){
         memories[i] = 10*i;
     }
 
-    FILE *fp = fopen("output.csv", "w");
+    FILE *fp = fopen("output_rationality.csv", "w");
 
     for (int m = 0; m < 10; m++) {
         for (int t_i = 0; t_i < 3; t_i++) {
@@ -127,5 +127,70 @@ int debuggingMode(ParamPtr (*parFun)()){
     printf("final evaluation: %f\n", evalCoopPercent(param, Cells));
     freeMatrix(Cells, param->dim);
 
+    return 0;
+}
+
+int percentSampling1(ParamPtr (*parFun)()){
+    int memories[6] = {0, 1, 2, 5, 8, 10};
+
+    FILE *fp = fopen("output_percentSampling1.csv", "w");
+
+    for (int m = 0; m < 6; m++){
+        ParamPtr param = parFun();
+        param->max_memory = memories[m];
+        Cell_ptr ** Cells = randMatrixCreator(param);
+        for(int k = 0; k < param->iteration; k++){ // number of epoc
+            neighborhoodApply(param, incrementPoint, Cells);
+            randNeighbourApply(param, changeStrategy, Cells);   
+            fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
+            
+        }
+        freeMatrix(Cells, param->dim);
+    }
+    fclose(fp);
+    return 0;
+}
+
+int percentSampling2(ParamPtr (*parFun)()){
+    int memories[6] = {20, 30, 50, 80, 100, 200};
+
+    FILE *fp = fopen("output_percentSampling2.csv", "w");
+
+    for (int m = 0; m < 6; m++){
+        ParamPtr param = parFun();
+        param->max_memory = memories[m];
+        Cell_ptr ** Cells = randMatrixCreator(param);
+        for(int k = 0; k < param->iteration; k++){ // number of epoc
+            neighborhoodApply(param, incrementPoint, Cells);
+            randNeighbourApply(param, changeStrategy, Cells);   
+            fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
+            
+        }
+        freeMatrix(Cells, param->dim);
+    }
+    fclose(fp);
+    return 0;
+}
+
+int betaVariation(ParamPtr (*parFun)()){
+    int betas[5] = {0.1, 0.3, 0.5, 0.7, 0.9};
+
+    FILE *fp = fopen("output_beta.csv", "w");
+
+    for (int b = 0; b < 5; b++){
+        ParamPtr param = parFun();
+        param->max_memory = 7;
+        param->t = 1.05;
+        param->beta = betas[b];
+        Cell_ptr ** Cells = randMatrixCreator(param);
+        for(int k = 0; k < param->iteration; k++){ // number of epoc
+            neighborhoodApply(param, incrementPoint, Cells);
+            randNeighbourApply(param, changeStrategy, Cells);   
+            fprintf(fp, "%i, %f, %f\n", k, evalCoopPercent(param, Cells), param->beta);
+            
+        }
+        freeMatrix(Cells, param->dim);
+    }
+    fclose(fp);
     return 0;
 }
