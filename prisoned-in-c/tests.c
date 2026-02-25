@@ -27,7 +27,7 @@ int temptatioUnparallel(ParamPtr (*parFun)()){
             printf("thread %i, memory: %i, Temptation: %f\n", omp_get_thread_num(), param->max_memory, param->t);
 
             Cell_ptr ** Cells = randMatrixCreator(param);
-            for(int k = 0; k < param->iteration; k++){ // number of epoc
+            for(int k = 0; k < param->max_iteration; k++){ // number of epoc
                 neighborhoodApply(param, incrementPoint, Cells);
                 randNeighbourApply(param, changeStrategy, Cells);
             }
@@ -61,7 +61,7 @@ int temptatioParallel(ParamPtr (*parFun)()){
 
 
             Cell_ptr ** Cells = randMatrixCreator(param);
-            for(int k = 0; k < param->iteration; k++){ // number of epoc
+            for(int k = 0; k < param->max_iteration; k++){ // number of epoc
                 neighborhoodApply(param, incrementPoint, Cells);
                 randNeighbourApply(param, changeStrategy, Cells);
             }
@@ -95,7 +95,7 @@ int memoryRationality(ParamPtr (*parFun)()){
             param->k = k_arr[t_i];
 
             Cell_ptr ** Cells = randMatrixCreator(param);
-            for(int k = 0; k < param->iteration; k++){ // number of epoc
+            for(int k = 0; k < param->max_iteration; k++){ // number of epoc
                 neighborhoodApply(param, incrementPoint, Cells);
                 randNeighbourApply(param, changeStrategy, Cells);
             }
@@ -139,9 +139,10 @@ int percentSampling1(ParamPtr (*parFun)()){
         ParamPtr param = parFun();
         param->max_memory = memories[m];
         Cell_ptr ** Cells = randMatrixCreator(param);
-        for(int k = 0; k < param->iteration; k++){ // number of epoc
+        fprintf(fp, "%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
+        for(int k = 1; k < param->max_iteration; k++){ // number of epoc
             neighborhoodApply(param, incrementPoint, Cells);
-            randNeighbourApply(param, changeStrategy, Cells);   
+            neighborhoodApply(param, changeStrategy, Cells);   
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
         }
@@ -160,9 +161,10 @@ int percentSampling2(ParamPtr (*parFun)()){
         ParamPtr param = parFun();
         param->max_memory = memories[m];
         Cell_ptr ** Cells = randMatrixCreator(param);
-        for(int k = 0; k < param->iteration; k++){ // number of epoc
+        printf("%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
+        for(int k = 1; k < param->max_iteration; k++){ // number of epoc
             neighborhoodApply(param, incrementPoint, Cells);
-            randNeighbourApply(param, changeStrategy, Cells);   
+            neighborhoodApply(param, changeStrategy, Cells);   
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
         }
@@ -183,9 +185,10 @@ int betaVariation(ParamPtr (*parFun)()){
         param->t = 1.05;
         param->beta = betas[b];
         Cell_ptr ** Cells = randMatrixCreator(param);
-        for(int k = 0; k < param->iteration; k++){ // number of epoc
+        for(int k = 0; k < param->max_iteration; k++){ // number of epoc
+            param->actual_iteration = k;
             neighborhoodApply(param, incrementPoint, Cells);
-            randNeighbourApply(param, changeStrategy, Cells);   
+            randNeighbourApply(param, changeStrategy, Cells);
             fprintf(fp, "%i, %f, %f\n", k, evalCoopPercent(param, Cells), param->beta);
             
         }

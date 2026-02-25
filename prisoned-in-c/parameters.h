@@ -4,7 +4,8 @@
 struct Param
 {
     int dim;
-    int iteration;
+    int max_iteration;
+    int actual_iteration;
     int image_proportion;
     int image_step;
 

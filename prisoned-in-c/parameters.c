@@ -5,7 +5,8 @@ ParamPtr easyParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
     param->dim = 20;
     param->image_proportion = 4;
-    param->iteration = 500;
+    param->max_iteration = 500;
+    param->actual_iteration = 0;
     param->image_step = 50;
 
     param->t = 1.05;
@@ -24,7 +25,8 @@ ParamPtr standardParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
     param->dim = 200;
     param->image_proportion = 4;
-    param->iteration = 500;
+    param->max_iteration = 500;
+    param->actual_iteration = 0;
     param->image_step = 50;
 
     param->t = 1.05;
@@ -43,7 +45,8 @@ ParamPtr strongParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
     param->dim = 200;
     param->image_proportion = 4;
-    param->iteration = 10000;
+    param->max_iteration = 10000;
+    param->actual_iteration = 0;
     param->image_step = 500;
 
     param->t = 1.05;
@@ -62,7 +65,8 @@ ParamPtr funkyParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
     param->dim = 50;
     param->image_proportion = 4;
-    param->iteration = 10000;
+    param->max_iteration = 10000;
+    param->actual_iteration = 0;
     param->image_step = 500;
 
     param->t = 1.05;
