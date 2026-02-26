@@ -95,14 +95,13 @@ void freeMatrix(Cell_ptr **Cells, int dim){
 }
 
 int main(){
-    
+
     ParamPtr (* parameters)() = funkyParameters;
-    Cell_ptr ** matri = halfMatrixCreator(parameters());
-    printf("%f\n", evalCoopPercent(parameters(), matri));
+
     float startTime = (float)clock()/3000000;
-    percentSampling1(parameters);
+//    percentSampling1(parameters);
 //    percentSampling2(parameters);
-//    betaVariation(parameters);
+    betaVariation(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
