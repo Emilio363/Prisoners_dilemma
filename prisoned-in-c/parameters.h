@@ -24,8 +24,11 @@ typedef struct Param * ParamPtr;
 
 
 ParamPtr easyParameters();
+
 ParamPtr standardParameters();
+
 ParamPtr strongParameters();
+
 ParamPtr funkyParameters();
 
 #endif

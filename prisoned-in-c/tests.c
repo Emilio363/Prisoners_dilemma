@@ -142,7 +142,8 @@ int percentSampling1(ParamPtr (*parFun)()){
         fprintf(fp, "%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
         for(int k = 1; k < param->max_iteration; k++){ // number of epoc
             neighborhoodApply(param, incrementPoint, Cells);
-            neighborhoodApply(param, changeStrategy, Cells);   
+            neighborhoodApply(param, changeStrategy, Cells);
+            allMatrixPointZero(param, Cells);
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
         }

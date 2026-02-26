@@ -6,6 +6,15 @@
 #include "sys/types.h"
 #include "parameters.h"
 
+int allMatrixPointZero(ParamPtr param, Cell_ptr ** Cells){
+    for(int i = 0; i<param->dim; i++){
+        for(int j = 0; j<param->dim; j++){
+            Cells[i][j]->point = 0;
+        }
+    }
+    return 0;
+}
+
 int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
                     Cell_ptr ** Cells){
     for(int i = 0; i<param->dim; i++ ){
@@ -59,27 +68,6 @@ int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamP
     
     fun(Cells[row][col], Cells[nrow][ncol], param);
     return 0;
-}
-
-float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
-    char move1 = player1->strategy();
-    char move2 = player2->strategy();
-
-    if ((move1 == 'C') && (move2 == 'C')) {
-        return param->r;
-    }
-    else if ((move1 == 'C') && (move2 == 'D')) {
-        return param->s;
-    }
-    else if ((move1 == 'D') && (move2 == 'C')) {
-        return param->t;
-    }
-    else if ((move1 == 'D') && (move2 == 'D')) {
-        return param->p;
-    }
-    else {
-        return -1;
-    }
 }
 
 // una funzione per trovare il colore della cella

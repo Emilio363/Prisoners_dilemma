@@ -26,7 +26,6 @@ int close_image(ppm_ptr img);
 
 void _write_color (ppm_ptr img, int i, int j, u_int8_t * colors);
 
-
 int CellsMatrixinPPM(int dim, Cell_ptr ** matrix, ppm_ptr image);
 
 u_int8_t * testColor(int col, int row);

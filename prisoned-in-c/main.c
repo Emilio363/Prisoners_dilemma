@@ -101,8 +101,8 @@ int main(){
     printf("%f\n", evalCoopPercent(parameters(), matri));
     float startTime = (float)clock()/3000000;
     percentSampling1(parameters);
-    percentSampling2(parameters);
-    betaVariation(parameters);
+//    percentSampling2(parameters);
+//    betaVariation(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
