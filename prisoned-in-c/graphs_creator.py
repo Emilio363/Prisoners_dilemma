@@ -25,7 +25,7 @@ if os.path.exists(file_csv):
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("grafico.png")
+    plt.savefig("output_temptation.png")
 
 
 # Nome del file

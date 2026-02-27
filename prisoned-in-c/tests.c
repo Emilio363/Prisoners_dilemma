@@ -131,18 +131,18 @@ int debuggingMode(ParamPtr (*parFun)()){
 }
 
 int percentSampling1(ParamPtr (*parFun)()){
-    int memories[6] = {0, 1, 2, 5, 8, 10};
+    int memories[11] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
     FILE *fp = fopen("output_percentSampling1.csv", "w");
 
-    for (int m = 0; m < 6; m++){
+    for (int m = 0; m < 11; m++){
         ParamPtr param = parFun();
         param->max_memory = memories[m];
         Cell_ptr ** Cells = randMatrixCreator(param);
         fprintf(fp, "%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
         for(int k = 1; k < param->max_iteration; k++){ // number of epoc
-            neighborhoodApply(param, incrementPoint, Cells);
-            neighborhoodApply(param, changeStrategy, Cells);
+            randNeighbourApply(param, incrementPoint, Cells);
+            randNeighbourApply(param, changeStrategy, Cells);
             allMatrixPointZero(param, Cells);
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
@@ -164,8 +164,8 @@ int percentSampling2(ParamPtr (*parFun)()){
         Cell_ptr ** Cells = randMatrixCreator(param);
         printf("%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
         for(int k = 1; k < param->max_iteration; k++){ // number of epoc
-            neighborhoodApply(param, incrementPoint, Cells);
-            neighborhoodApply(param, changeStrategy, Cells);   
+            randNeighbourApply(param, incrementPoint, Cells);
+            randNeighbourApply(param, changeStrategy, Cells);   
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
         }
