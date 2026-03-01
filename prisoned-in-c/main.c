@@ -202,16 +202,16 @@ int betaVariation(ParamPtr (*parFun)()){
 }
 
 int myTemptationBetaMem(ParamPtr (*parFun)()){
-    int memories[3] = {0,1,9};
+    int memories[4] = {0,3,9, 27};
     float betas[6] = {0.1,0.2,0.3,0.5,0.7,0.9};
-    int t_dim = 16;
+    int t_dim = 20;
     double t_arr[t_dim];
 
     for(int i = 0; i<t_dim; i++){
-        t_arr[i] = 1.0 + i*0.01;
+        t_arr[i] = 0.96 + i*0.01;
     }
 
-    for(int m = 0; m<3; m++){
+    for(int m = 0; m<4; m++){
         char filename[100];
         printf("memory: %i\n", memories[m]);
         snprintf(filename, sizeof(filename), "temp_beta_mem_%d.csv", memories[m]);
@@ -225,18 +225,19 @@ int myTemptationBetaMem(ParamPtr (*parFun)()){
                 param->max_memory = memories[m];
                 param->beta = betas[b];
                 param->t = t_arr[t_i];
-                printf("start N ciclo %i\n", m*t_dim+t_i);
+                printf("start %i ciclo di %i\n", b*t_dim+t_i, 6*t_dim);
 
 
                 Cell_ptr ** Cells = randMatrixCreator(param);
                 for(int k = 0; k < param->max_iteration; k++){ // number of epoc
                     neighborhoodApply(param, incrementPoint, Cells);
                     randNeighbourApply(param, changeStrategy, Cells);
+                    allMatrixPointZero(param, Cells);
                 }
-                printf("END N ciclo %i\n", m*20+t_i);
+                printf("END %i ciclo\n", b*t_dim+t_i);
                 #pragma omp critical
                 {
-                    fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->beta);
+                    fprintf(fp, "%f, %f, %f\n", param->t, evalCoopPercent(param, Cells), param->beta);
                 }
                 freeMatrix(Cells, param->dim);
             }
@@ -248,25 +249,37 @@ int myTemptationBetaMem(ParamPtr (*parFun)()){
 }
 
 int myPercentKBetaMulti(ParamPtr (*parFun)()){
-    float betas[6] = {0.1, 0.2, 0.3, 0.5, 0.7, 0.9};
-    float ks[3] = {0.1, 0.5, 1.0};
-    for (int k = 0; k < 3; k++){
+    int b_dim = 8;
+    float betas[8] = {0, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9, 1};
+    int k_dim = 4;
+    float ks[4] = {0.1, 0.3, 0.8, 2.0};
+    int memory = 4;
+    for (int k = 0; k < k_dim; k++){
+        
         char filename[100];
-        printf("memory: %f\n", betas[k]);
-        snprintf(filename, sizeof(filename), "beta_multi_%f.csv", betas[k]);
-
+        printf("rationality: %f\n", ks[k]);
+        
+        snprintf(filename, sizeof(filename), "K_beta_multi_%f.csv", ks[k]);
         FILE *fp = fopen(filename, "w");
+
+        #pragma omp parallel for collapse(2)
         for(int multi = 1; multi < 10; multi++){
-            for (int m = 0; m < 6; m++){
+            for (int m = 0; m < b_dim; m++){
                 ParamPtr param = parFun();
                 param->beta = betas[m];
+                param->k = ks[k];
+                param->max_memory = memory;
+                
+                printf("start %i ciclo di %i\n", multi*b_dim+m, 6*b_dim);
                 Cell_ptr ** Cells = randMatrixCreator(param);
                 for(int k = 1; k < param->max_iteration; k++){ // number of epoc
                     neighborhoodApply(param, incrementPoint, Cells);
                     randNeighbourApply(param, changeStrategy, Cells);
                     allMatrixPointZero(param, Cells);
-                    fprintf(fp, "%i, %f, %f, %i\n", k, evalCoopPercent(param, Cells), param->beta, multi);
-                    
+                    #pragma omp critical
+                    {
+                        fprintf(fp, "%i, %f, %f, %i\n", k, evalCoopPercent(param, Cells), param->beta, multi);
+                    }
                 }
                 freeMatrix(Cells, param->dim);
             }
@@ -279,9 +292,10 @@ int myPercentKBetaMulti(ParamPtr (*parFun)()){
 
 int main(){
 
-    ParamPtr (* parameters)() = easyParameters;
+    ParamPtr (* parameters)() = strongParameters;
 
     float startTime = (float)clock()/3000000;
+    myTemptationBetaMem(parameters);
     myPercentKBetaMulti(parameters);
     float endTime = (float)clock()/3000000;
 

@@ -101,21 +101,12 @@ def tempBetaMem0():
 
         for i, classe in enumerate(classi):
             subset = df[df["beta"] == classe].sort_values(by="x")
-
-            # punti
-            plt.scatter(
-                subset["x"],
-                subset["y"],
-                label=f"Beta={classe}",
-                marker=markers[i % len(markers)],
-                s=80
-            )
-
-            # linee che uniscono i punti
+#            plt.scatter(subset["x"], subset["y"], label=f"Beta={classe}", marker=markers[i % len(markers)], s=80)
             plt.plot(
                 subset["x"],
                 subset["y"],
-                linestyle='-'
+                linestyle='-',
+                label=f"Beta={classe}"
             )
         
         plt.xlabel("Temptation (T)")
@@ -126,8 +117,8 @@ def tempBetaMem0():
         plt.tight_layout()
         plt.savefig("temp_beta_mem_0.png")
 
-def tempBetaMem1():
-    file_csv = "temp_beta_mem_1.csv"
+def tempBetaMem3():
+    file_csv = "temp_beta_mem_3.csv"
     if os.path.exists(file_csv):
         df = pd.read_csv(file_csv, header=None, names=["x", "y", "beta"])
         classi = sorted(df["beta"].unique())
@@ -135,21 +126,22 @@ def tempBetaMem1():
         plt.figure(figsize=(8, 6))
 
         for i, classe in enumerate(classi):
-            subset = df[df["beta"] == classe]
-            plt.scatter(
+            subset = df[df["beta"] == classe].sort_values(by="x")
+#            plt.scatter(subset["x"], subset["y"], label=f"Beta={classe}", marker=markers[i % len(markers)], s=80)
+            plt.plot(
                 subset["x"],
                 subset["y"],
-                label=f"Beta={classe}",
-                marker=markers[i % len(markers)],
-                s=80
+                linestyle='-',
+                label=f"Beta={classe}"
             )
+
         plt.xlabel("Temptation (T)")
         plt.ylabel("Percent of Cooperation")
-        plt.title("Tempation for different Beta values (Memory=1)")
+        plt.title("Tempation for different Beta values (Memory=3)")
         plt.legend()
         plt.grid(True)
         plt.tight_layout()
-        plt.savefig("temp_beta_mem_1.png")
+        plt.savefig("temp_beta_mem_3.png")
 
 def tempBetaMem9():
     file_csv = "temp_beta_mem_9.csv"
@@ -176,6 +168,48 @@ def tempBetaMem9():
         plt.tight_layout()
         plt.savefig("temp_beta_mem_9.png")
 
-tempBetaMem0()
-#tempBetaMem1()
-#tempBetaMem9()
+def tempBetaMem27():
+    file_csv = "temp_beta_mem_27.csv"
+    if os.path.exists(file_csv):
+        df = pd.read_csv(file_csv, header=None, names=["x", "y", "beta"])
+        classi = sorted(df["beta"].unique())
+        markers = ['o', 's', '^', 'D', 'v', 'P', '*', 'X', '<', '>']
+        plt.figure(figsize=(8, 6))
+
+        for i, classe in enumerate(classi):
+            subset = df[df["beta"] == classe]
+            plt.scatter(
+                subset["x"],
+                subset["y"],
+                label=f"Beta={classe}",
+                marker=markers[i % len(markers)],
+                s=80
+            )
+        plt.xlabel("Temptation (T)")
+        plt.ylabel("Percent of Cooperation")
+        plt.title("Tempation for different Beta values (Memory=9)")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig("temp_beta_mem_27.png")
+
+def percBetaMulti01():
+    df = pd.read_csv("K_beta_multi_.csv", header=None, names=["x", "y", "classe1", "classe2"])
+
+    # media di y per (x, classe1), ignorando classe2
+    df_media = df.groupby(["x", "classe1"], as_index=False)["y"].mean()
+
+    # plot
+    classi = sorted(df_media["classe1"].unique())
+
+    for classe in classi:
+        subset = df_media[df_media["classe1"] == classe].sort_values(by="x")
+        plt.plot(subset["x"], subset["y"], label=f"beta={classe}")
+
+    plt.xlabel("Iteration")
+    plt.ylabel("mean percent of cooperation")
+    plt.legend()
+    plt.savefig("perc_beta_multi_k_01.png")
+
+#tempBetaMem0()
+tempBetaMem3()
