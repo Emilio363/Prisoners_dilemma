@@ -55,7 +55,7 @@ ParamPtr strongParameters(){
     param->s = 0;
 
     param->max_memory = 0;
-    param->k = 1.05;
+    param->k = 0.1;
     param->beta = 0.5;
 
     return param;
@@ -75,7 +75,7 @@ ParamPtr funkyParameters(){
     param->s = 0;
 
     param->max_memory = 0;
-    param->k = 1.05;
+    param->k = 0.1;
     param->beta = 0.5;
 
     return param;

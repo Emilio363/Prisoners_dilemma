@@ -43,13 +43,13 @@ int temptatioUnparallel(ParamPtr (*parFun)()){
 }
 
 int temptatioParallel(ParamPtr (*parFun)()){
-    int memories[] = {0,1,3,5,7,9};
+    int memories[6] = {0,1,3,5,7,9};
     double t_arr[20];
     for(int i = 0; i<20; i++){
         t_arr[i] = 1.0 + i*0.025;
     }
 
-    FILE *fp = fopen("output_temptation.csv", "w");
+    FILE *fp = fopen("output_temptation_par.csv", "w");
     #pragma omp parallel for collapse(2)
     for (int m = 0; m < 6; m++) {
         for (int t_i = 0; t_i < 20; t_i++) {
@@ -201,15 +201,58 @@ int betaVariation(ParamPtr (*parFun)()){
     return 0;
 }
 
+int myTemptationBetaMem(ParamPtr (*parFun)()){
+    int memories[3] = {0,1,9};
+    float betas[6] = {0.1,0.2,0.3,0.5,0.7,0.9};
+    double t_arr[16];
+
+    for(int i = 0; i<16; i++){
+        t_arr[i] = 1.0 + i*0.01;
+    }
+
+    for(int m = 0; m<3; m++){
+        char filename[100];
+        printf("memory: %i\n", memories[m]);
+        snprintf(filename, sizeof(filename), "temp_beta_mem_%d.csv", memories[m]);
+
+        FILE *fp = fopen(filename, "w");
+        #pragma omp parallel for collapse(2)
+        for (int b = 0; b < 6; b++) {
+            for (int t_i = 0; t_i < 16; t_i++) {
+
+                ParamPtr param = parFun();
+                param->max_memory = memories[m];
+                param->beta = betas[b];
+                param->t = t_arr[t_i];
+                printf("start N ciclo %i\n", m*20+t_i);
+
+
+                Cell_ptr ** Cells = randMatrixCreator(param);
+                for(int k = 0; k < param->max_iteration; k++){ // number of epoc
+                    neighborhoodApply(param, incrementPoint, Cells);
+                    randNeighbourApply(param, changeStrategy, Cells);
+                }
+                printf("END N ciclo %i\n", m*20+t_i);
+                #pragma omp critical
+                {
+                    fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->max_memory);
+                }
+                freeMatrix(Cells, param->dim);
+            }
+        }
+
+        fclose(fp);
+    }
+    return 0;
+}
+
+
 int main(){
 
-    ParamPtr (* parameters)() = funkyParameters;
+    ParamPtr (* parameters)() = easyParameters;
 
     float startTime = (float)clock()/3000000;
-    percentSampling1(parameters);
-    percentSampling2(parameters);
-    betaVariation(parameters);
-//    debuggingMode(parameters);
+    myTemptationBetaMem(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
