@@ -20,7 +20,7 @@ int neighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
     for(int i = 0; i<param->dim; i++ ){
         for(int j = 0; j<param->dim; j++){
             Cells[i][j]->point = 0;
-            _oneNeighborhoodApply(param, incrementPoint, Cells, i, j);
+            _oneNeighborhoodApply(param, fun, Cells, i, j);
         }
     }
     return 0;
@@ -43,30 +43,32 @@ int _oneNeighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPt
     return 0;
 }
 
-int randNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
+int randNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, float),
                     Cell_ptr ** Cells){
+    u_int32_t intrand = xorshift32(rand());
     for(int i = 0; i<param->dim; i++){
         for(int j = 0; j<param->dim; j++){
-            _oneRandNeighbourApply(param, fun, Cells, i, j);
+            intrand = xorshift32(intrand);
+            _oneRandNeighbourApply(param, fun, Cells, i, j, intrand);
         }
     }
     return 0;
 }
 
-int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
-                    Cell_ptr ** Cells , int row, int col){
+int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, float),
+                    Cell_ptr ** Cells , int row, int col, u_int32_t intrand){
     int dx[] = { -1, 1, 0, 0 };  // line offset
     int dy[] = {  0, 0, -1, 1 }; // col offset
     int nrow;
     int ncol;
 
     do{
-        int dir = rand()%4;
+        int dir = intrand%4;
         nrow = row + dx[dir];
         ncol = col + dy[dir];
     }while(!(nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim));
-    
-    fun(Cells[row][col], Cells[nrow][ncol], param);
+    float floatrand = (float)intrand/4294967296.0f;
+    fun(Cells[row][col], Cells[nrow][ncol], param, floatrand);
     return 0;
 }
 

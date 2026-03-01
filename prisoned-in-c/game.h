@@ -24,12 +24,11 @@ int neighborhoodApply(ParamPtr param,
 int _oneNeighborhoodApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
                     Cell_ptr ** Cells , int row, int col);
 
-int randNeighbourApply(ParamPtr param,
-    int (*fun)(Cell_ptr, Cell_ptr, ParamPtr), 
-    Cell_ptr ** Cells);
+int randNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, float),
+                    Cell_ptr ** Cells);
 
-int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
-                    Cell_ptr ** Cells , int row, int col);
+int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, float),
+                    Cell_ptr ** Cells , int row, int col, u_int32_t intrand);
 
 u_int8_t * colorOfCell(Cell_ptr player);
 

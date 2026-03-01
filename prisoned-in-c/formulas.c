@@ -17,6 +17,13 @@ float H_x(int memory, ParamPtr param) {
         return 1-(1-param->beta)*memory/param->max_memory;}
 }
 
+u_int32_t xorshift32(u_int32_t x) {
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    return x;
+}
+
 float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
     char move1 = player1->strategy();
     char move2 = player2->strategy();
@@ -43,14 +50,12 @@ int incrementPoint(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
     return 0;
 }
 
-int changeStrategy(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
-    float thisrand = rand();
+int changeStrategy(Cell_ptr player1, Cell_ptr player2, ParamPtr param, float thisrand){
 //    printf("maybe change");  //to debug
     
     float prob = H_x(player1->memory, param)*fermi(player1->point, player2->point, param);
     char (*newstrategy)() = player1->strategy;
     
-    thisrand /= RAND_MAX;
 //    printf(" %f, %f, %i \n", prob, thisrand, myrand); //to debugr
     if (prob > thisrand){
 //        printf("changing strategy\n"); //to debug

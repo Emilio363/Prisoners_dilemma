@@ -141,7 +141,7 @@ int percentSampling1(ParamPtr (*parFun)()){
         Cell_ptr ** Cells = randMatrixCreator(param);
         fprintf(fp, "%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
         for(int k = 1; k < param->max_iteration; k++){ // number of epoc
-            randNeighbourApply(param, incrementPoint, Cells);
+            neighborhoodApply(param, incrementPoint, Cells);
             randNeighbourApply(param, changeStrategy, Cells);
             allMatrixPointZero(param, Cells);
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
@@ -164,7 +164,7 @@ int percentSampling2(ParamPtr (*parFun)()){
         Cell_ptr ** Cells = randMatrixCreator(param);
         printf("%i, %f, %i\n", 0, evalCoopPercent(param, Cells), param->max_memory);
         for(int k = 1; k < param->max_iteration; k++){ // number of epoc
-            randNeighbourApply(param, incrementPoint, Cells);
+            neighborhoodApply(param, incrementPoint, Cells);
             randNeighbourApply(param, changeStrategy, Cells);   
             fprintf(fp, "%i, %f, %i\n", k, evalCoopPercent(param, Cells), param->max_memory);
             
