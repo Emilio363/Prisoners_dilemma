@@ -204,9 +204,10 @@ int betaVariation(ParamPtr (*parFun)()){
 int myTemptationBetaMem(ParamPtr (*parFun)()){
     int memories[3] = {0,1,9};
     float betas[6] = {0.1,0.2,0.3,0.5,0.7,0.9};
-    double t_arr[16];
+    int t_dim = 16;
+    double t_arr[t_dim];
 
-    for(int i = 0; i<16; i++){
+    for(int i = 0; i<t_dim; i++){
         t_arr[i] = 1.0 + i*0.01;
     }
 
@@ -218,13 +219,13 @@ int myTemptationBetaMem(ParamPtr (*parFun)()){
         FILE *fp = fopen(filename, "w");
         #pragma omp parallel for collapse(2)
         for (int b = 0; b < 6; b++) {
-            for (int t_i = 0; t_i < 16; t_i++) {
+            for (int t_i = 0; t_i < t_dim; t_i++) {
 
                 ParamPtr param = parFun();
                 param->max_memory = memories[m];
                 param->beta = betas[b];
                 param->t = t_arr[t_i];
-                printf("start N ciclo %i\n", m*20+t_i);
+                printf("start N ciclo %i\n", m*t_dim+t_i);
 
 
                 Cell_ptr ** Cells = randMatrixCreator(param);
@@ -235,12 +236,41 @@ int myTemptationBetaMem(ParamPtr (*parFun)()){
                 printf("END N ciclo %i\n", m*20+t_i);
                 #pragma omp critical
                 {
-                    fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->max_memory);
+                    fprintf(fp, "%f, %f, %i\n", param->t, evalCoopPercent(param, Cells), param->beta);
                 }
                 freeMatrix(Cells, param->dim);
             }
         }
 
+        fclose(fp);
+    }
+    return 0;
+}
+
+int myPercentKBetaMulti(ParamPtr (*parFun)()){
+    float betas[6] = {0.1, 0.2, 0.3, 0.5, 0.7, 0.9};
+    float ks[3] = {0.1, 0.5, 1.0};
+    for (int k = 0; k < 3; k++){
+        char filename[100];
+        printf("memory: %f\n", betas[k]);
+        snprintf(filename, sizeof(filename), "beta_multi_%f.csv", betas[k]);
+
+        FILE *fp = fopen(filename, "w");
+        for(int multi = 1; multi < 10; multi++){
+            for (int m = 0; m < 6; m++){
+                ParamPtr param = parFun();
+                param->beta = betas[m];
+                Cell_ptr ** Cells = randMatrixCreator(param);
+                for(int k = 1; k < param->max_iteration; k++){ // number of epoc
+                    neighborhoodApply(param, incrementPoint, Cells);
+                    randNeighbourApply(param, changeStrategy, Cells);
+                    allMatrixPointZero(param, Cells);
+                    fprintf(fp, "%i, %f, %f, %i\n", k, evalCoopPercent(param, Cells), param->beta, multi);
+                    
+                }
+                freeMatrix(Cells, param->dim);
+            }
+        }
         fclose(fp);
     }
     return 0;
@@ -252,7 +282,7 @@ int main(){
     ParamPtr (* parameters)() = easyParameters;
 
     float startTime = (float)clock()/3000000;
-    myTemptationBetaMem(parameters);
+    myPercentKBetaMulti(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
