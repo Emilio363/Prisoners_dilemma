@@ -99,9 +99,10 @@ int main(){
     ParamPtr (* parameters)() = funkyParameters;
 
     float startTime = (float)clock()/3000000;
-//    percentSampling1(parameters);
-//    percentSampling2(parameters);
+    percentSampling1(parameters);
+    percentSampling2(parameters);
     betaVariation(parameters);
+//    debuggingMode(parameters);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;

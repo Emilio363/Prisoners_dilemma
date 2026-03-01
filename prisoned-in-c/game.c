@@ -62,13 +62,16 @@ int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamP
     int nrow;
     int ncol;
 
-    do{
-        int dir = intrand%4;
-        nrow = row + dx[dir];
-        ncol = col + dy[dir];
-    }while(!(nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim));
-    float floatrand = (float)intrand/4294967296.0f;
-    fun(Cells[row][col], Cells[nrow][ncol], param, floatrand);
+    int dir = intrand%4;
+    nrow = row + dx[dir];
+    ncol = col + dy[dir];
+    if(nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){
+        /*
+        printf("row: %i, col: %i, dx: %i, dy: %i\n", row, col, dx[dir], dy[dir]);
+        printf("row: %i, col: %i, nrow: %i, ncol: %i\n", row, col, nrow, ncol);*/
+        float floatrand = (float)intrand/4294967296.0f;
+        fun(Cells[row][col], Cells[nrow][ncol], param, floatrand);
+    }
     return 0;
 }
 

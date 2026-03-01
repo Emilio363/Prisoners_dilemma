@@ -117,8 +117,10 @@ int debuggingMode(ParamPtr (*parFun)()){
     for(int k = 0; k < 10; k++){ // number of epoc
         neighborhoodApply(param, incrementPoint, Cells);
         randNeighbourApply(param, changeStrategy, Cells);
+            printf("percernt: %f\n", evalCoopPercent(param, Cells));
 
             stampStrategies(param, Cells);
+            printf("percernt: %f\n", evalCoopPercent(param, Cells));
             stampMemory(param, Cells);
 
             printf("percernt: %f\n", evalCoopPercent(param, Cells));
