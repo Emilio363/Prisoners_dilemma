@@ -81,7 +81,7 @@ u_int8_t * colorOfCell(Cell_ptr player){
 }
 
 Cell_ptr ** halfMatrixCreator(ParamPtr param){
-    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr));
+    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr*));
 
     for(int i = 0; i<param->dim; i++){
         Cells[i] = (Cell_ptr*) malloc(param->dim * sizeof(Cell_ptr));
@@ -113,7 +113,7 @@ char (*_randomStrategy(void))(void){
 }
 
 Cell_ptr ** randMatrixCreator(ParamPtr param){
-    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr));
+    Cell_ptr ** Cells =(Cell_ptr**) malloc(param->dim * sizeof(Cell_ptr*));
 
     for(int i = 0; i<param->dim; i++){
         Cells[i] = (Cell_ptr*) malloc(param->dim * sizeof(Cell_ptr));

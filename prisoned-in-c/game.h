@@ -13,6 +13,16 @@ struct aCell{
 typedef struct aCell Cell_str;
 typedef struct aCell * Cell_ptr ;
 
+struct dataHolder{
+    float points[6];
+    int memories[6];
+    int strategies[6];
+};
+
+typedef struct dataHolder Data_str;
+typedef struct dataHolder * Data_ptr;
+
+
 int allMatrixPointZero(ParamPtr param, Cell_ptr ** Cells);
 
 Cell_ptr ** halfMatrixCreator(ParamPtr par);

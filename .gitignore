@@ -26,3 +26,4 @@ prisoned-in-c/small_venv/
 prisoned-in-c/main
 
 *.csv
+.so
