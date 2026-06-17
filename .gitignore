@@ -12,6 +12,7 @@ graph-tool-documentation.pdf
 *.ppm
 
 *.o
+*.so
 
 prisoned-in-c/main
 

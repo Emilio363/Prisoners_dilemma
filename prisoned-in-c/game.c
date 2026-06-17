@@ -69,9 +69,61 @@ int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamP
         /*
         printf("row: %i, col: %i, dx: %i, dy: %i\n", row, col, dx[dir], dy[dir]);
         printf("row: %i, col: %i, nrow: %i, ncol: %i\n", row, col, nrow, ncol);*/
-        float floatrand = (float)intrand/4294967296.0f;
+        float floatrand = (float)intrand/4294967296.0f+0.5;
         fun(Cells[row][col], Cells[nrow][ncol], param, floatrand);
     }
+    return 0;
+}
+
+int matrixSIRUpdate(int ** initial, int ** targhet, 
+                SirParamPtr param){
+    u_int32_t intrand = xorshift32(rand());
+    for(int row = 0; row<param->dim; row++ ){
+        for(int col = 0; col<param->dim; col++){
+            intrand = xorshift32(intrand);
+            cellSIRUpdate(row, col, initial, targhet, param, intrand);
+        }
+    }
+    return 0;
+}
+
+/*
+se sono a 0 e ho un vicino infetto, allora posso essere infettato con una certa probabilità
+se sono infetto, allora divento resistente dopo un certo numero di iterazioni
+se sono resistente, allora divento suscettibile dopo un certo numero di iterazioni
+*/
+
+int cellSIRUpdate(int row, int col, int ** initial, int ** targhet, 
+                SirParamPtr param, int intrand){
+    
+    targhet[row][col] = initial[row][col];
+    if(initial[row][col] == 0){
+        int dx[] = { -1, 1, 0, 0 };  // line offset
+        int dy[] = {  0, 0, -1, 1 }; // col offset
+        for (int dir = 0; dir < 4; dir++) { //von newman neighboors
+            int nrow = row + dx[dir];
+            int ncol = col + dy[dir];
+            intrand = xorshift32(intrand);
+
+            if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
+                if(initial[nrow][ncol]>0 && initial[nrow][ncol]<=param->infected_time){ // near infected
+                    float floatrand = (float)intrand/4294967296.0f + 0.5;
+                    if(floatrand <= param->propagation_ratio){ //infection
+                        targhet[row][col] = 1;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+    if (initial[row][col] == param->resistent_time){
+        if(param->reinfected !=0){
+            targhet[row][col] = 0;
+            return 0;
+        }
+        return 0;
+    }
+    targhet[row][col] = initial[row][col] + 1;
     return 0;
 }
 
@@ -89,27 +141,16 @@ Cell_ptr ** halfMatrixCreator(ParamPtr param){
             Cells[i][j] = (Cell_str *) malloc(sizeof(Cell_str));
             Cells[i][j]->memory = 0;
             Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = cooperate;
+            Cells[i][j]->strategy = get_cooperate();
         }
         for(int j = param->dim/2; j<param->dim; j++ ){
             Cells[i][j] = (Cell_ptr) malloc(sizeof(Cell_str));
             Cells[i][j]->memory = 0;
             Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = defect;
+            Cells[i][j]->strategy = get_defect();
         }
     }
     return Cells;
-}
-
-char (*_randomStrategy(void))(void){
-    float num = rand();
-    num = num/RAND_MAX;
-    if(num<0.5){
-        return cooperate;
-    }
-    else{
-        return defect;
-    }
 }
 
 Cell_ptr ** randMatrixCreator(ParamPtr param){
@@ -121,8 +162,31 @@ Cell_ptr ** randMatrixCreator(ParamPtr param){
             Cells[i][j] = (Cell_str *) malloc(sizeof(Cell_str));
             Cells[i][j]->memory = 0;
             Cells[i][j]->point = 0;
-            Cells[i][j]->strategy = _randomStrategy();
+            Cells[i][j]->strategy = randomStrategy();
         }
     }
     return Cells;
+}
+
+int ** intMatrixCreator(ParamPtr param){
+    int ** matrix =(int**) malloc(param->dim * sizeof(int*));
+    for(int i = 0; i<param->dim; i++){
+        matrix[i] = (int*) malloc(param->dim * sizeof(int));
+        for(int j = 0; j<param->dim; j++ ){
+            matrix[i][j] = 0;
+        }
+    }
+    return matrix;
+}
+
+int ** intMatrixPopulator(SirParamPtr param, int ** matrix){
+    for(int i = 0; i<param->dim; i++){
+        for(int j = 0; j<param->dim; j++ ){
+            double randnum = (double)rand()/RAND_MAX;
+            if(randnum < param->initial_infected_ratio){
+                matrix[i][j] = 1;
+            }
+        }
+    }
+    return matrix;
 }

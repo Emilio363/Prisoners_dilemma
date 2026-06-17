@@ -12,6 +12,25 @@ char defect() {
     return 'D';
 }
 
+char (*randomStrategy(void))(void){
+    float num = rand();
+    num = num/RAND_MAX;
+    if(num<0.5){
+        return cooperate;
+    }
+    else{
+        return defect;
+    }
+}
+
+char (*get_defect(void))(void){
+    return defect;
+}
+
+char (*get_cooperate(void))(void){
+    return cooperate;
+}
+
 u_int8_t * strategyColor(char (*strategy)()){
     u_int8_t * color = (u_int8_t *)malloc(3*sizeof(u_int8_t));
     if (strategy == cooperate){

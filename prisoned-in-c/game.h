@@ -22,10 +22,7 @@ struct dataHolder{
 typedef struct dataHolder Data_str;
 typedef struct dataHolder * Data_ptr;
 
-
 int allMatrixPointZero(ParamPtr param, Cell_ptr ** Cells);
-
-Cell_ptr ** halfMatrixCreator(ParamPtr par);
 
 int neighborhoodApply(ParamPtr param,
     int (*fun)(Cell_ptr, Cell_ptr, ParamPtr),
@@ -40,10 +37,20 @@ int randNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, 
 int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamPtr, float),
                     Cell_ptr ** Cells , int row, int col, u_int32_t intrand);
 
+int matrixSIRUpdate(int ** initial, int ** targhet, 
+                SirParamPtr param);
+
+int cellSIRUpdate(int row, int col, int ** initial, int ** targhet, 
+                SirParamPtr param, int intrand);
+
 u_int8_t * colorOfCell(Cell_ptr player);
 
-char (*_randomStrategy(void))(void);
+Cell_ptr ** halfMatrixCreator(ParamPtr par);
 
 Cell_ptr ** randMatrixCreator(ParamPtr param);
+
+int ** intMatrixCreator(ParamPtr param);
+
+int ** intMatrixPopulator(SirParamPtr param, int ** matrix);
 
 #endif

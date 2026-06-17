@@ -11,8 +11,14 @@ all: main library
 main: ${OBJECTS}
 	${CC} ${CFLAGS} -o $@ $^ -lm
 
+library: $(LIBRARY)
+
 %.o: %.c ${HEADERS}
-	${CC} ${CFLAGS} -c $<
+	${CC} ${LIBFLAG} -c $<
+
+%.so: ${OBJECTS}
+	$(CC) $(LIBFLAG) -o $@ $^
+
 
 .PHONY: clean all
 
@@ -24,7 +30,3 @@ clean:
 
 cleanso:
 	rm -f *.so
-
-library:${LIBRARY}
-%.so: %.c ${HEADERS}
-	${CC} ${LIBFLAG} -o $@ $<

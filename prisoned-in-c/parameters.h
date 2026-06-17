@@ -22,6 +22,23 @@ struct Param
 typedef struct Param Parameters;
 typedef struct Param * ParamPtr;
 
+struct SIRParam
+{
+    int dim;
+    int max_iteration;
+    int image_proportion; //dimension in pixel of a cell in the immage
+    int image_step;
+
+    int infected_time;
+    int resistent_time;
+    double propagation_ratio; //probability for a cell to be infected if a neighboor is infect
+
+    double initial_infected_ratio;
+    int reinfected;
+};
+
+typedef struct SIRParam SIRParameters;
+typedef struct SIRParam * SirParamPtr;
 
 ParamPtr easyParameters();
 
@@ -31,4 +48,9 @@ ParamPtr strongParameters();
 
 ParamPtr funkyParameters();
 
+SirParamPtr easySirParameters();
+
+SirParamPtr stdInSIR(ParamPtr param);
+
+ParamPtr stdOutSIR(SirParamPtr param);
 #endif

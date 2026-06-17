@@ -289,14 +289,40 @@ int myPercentKBetaMulti(ParamPtr (*parFun)()){
     return 0;
 }
 
+Cell_ptr ** connectedMain(ParamPtr param){
+    printf("start\n");
+    Cell_ptr ** Cells = randMatrixCreator(param);
+    for(int k = 0; k < 10; k++){ // number of epoc
+        neighborhoodApply(param, incrementPoint, Cells);
+        randNeighbourApply(param, changeStrategy, Cells);
+    }
+    //NewPrintMatrix(param, Cells, param->iteration+m*100+t_i*10);
+    printf("final evaluation: %f\n", evalCoopPercent(param, Cells));
+    //freeMatrix(Cells, param->dim);
+
+    return Cells;
+}
 
 int main(){
 
-    ParamPtr (* parameters)() = strongParameters;
+//    ParamPtr (* parameters)() = strongParameters;
 
     float startTime = (float)clock()/3000000;
-    myTemptationBetaMem(parameters);
-    myPercentKBetaMulti(parameters);
+    int intrand = xorshift32(rand());
+    float min = 1;
+    float max = 0;
+    for(int i = 0; i<100; i++){
+        intrand = xorshift32(intrand);
+        float floatrand = (float)intrand/4294967296.0f +0.5;
+//        fprintf(stderr, "floatrand: %f\n", floatrand);
+        if(floatrand < min){
+            min = floatrand;
+        }
+        if(floatrand > max){
+            max = floatrand;}
+                    
+    }
+    fprintf(stderr, "min: %f, max: %f\n", min, max);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;
