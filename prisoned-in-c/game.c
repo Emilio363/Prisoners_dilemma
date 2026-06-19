@@ -143,19 +143,20 @@ int cellFireUpdate(int row, int col, int ** initial, int ** targhet,
                 FireParamPtr param, int intrand){
     targhet[row][col] = initial[row][col];
     if (initial[row][col] == 1){ // tree
-        int dir[] = {0, -1, 1};
-        for (int pos = 1; pos <9; pos++){
-            int nrow = row + dir[pos%3];
-            int ncol = col + dir[pos/3];
-            intrand = xorshift32(intrand);
-            if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
-                if(initial[nrow][ncol]==2){ // near infected
-                    float floatrand = (float)intrand/4294967296.0f + 0.5;
-                    if(floatrand <= param->propagation_ratio){
-                        targhet[row][col] = 2;
-                    }
-                    else {
-                        printf("not propagated, rand = %f soglia = %f\n", floatrand, param->propagation_ratio);
+        int dir[] = {-1, 0, 1};
+        for (int i = 0; i <3; i++){
+            for (int j = 0; j<3; j++){
+                int nrow = row + dir[j];
+                int ncol = col + dir[2-i];
+                intrand = xorshift32(intrand);
+                if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
+                    if(initial[nrow][ncol]==2){ // near infected
+                        float floatrand = (float)intrand/4294967296.0f;
+                        if(floatrand <= param->propagation_matrix[i][j]){
+                            targhet[row][col] = 2;
+                        }
+                        else {
+                        }
                     }
                 }
             }
@@ -238,7 +239,6 @@ int ** intMatrixPopulator(SirParamPtr param, int ** matrix){
 int ** FireMatrixCreator(FireParamPtr param){
     int ** matrix =(int**) malloc(param->dim * sizeof(int*));
     u_int32_t intrand = xorshift32(rand());
-    printf("tree: %f, burn: %f\n", param->initial_tree_ratio, param->initial_burn_ratio);
     for(int i = 0; i<param->dim; i++){
         matrix[i] = (int*) malloc(param->dim * sizeof(int));
         for(int j = 0; j<param->dim; j++ ){

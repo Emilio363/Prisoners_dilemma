@@ -24,6 +24,10 @@ u_int32_t xorshift32(u_int32_t x) {
     return x;
 }
 
+double norm(int * vec){
+    return sqrt(vec[0]*vec[0] + vec[1]*vec[1]);
+}
+
 float oneGame_oneResult(Cell_ptr player1, Cell_ptr player2, ParamPtr param){
     char move1 = player1->strategy();
     char move2 = player2->strategy();

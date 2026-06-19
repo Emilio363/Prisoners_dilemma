@@ -54,6 +54,7 @@ struct FireParam
     double propagation_ratio; //chance for a cell to be burned if a neighboor is burning
     int * wind_direction; //(-1, 0), (1, 0), (0, -1)
 // (-1, -1), (1, -1), (0, 1) (-1, 1) (1, 1)
+    double ** propagation_matrix;
     double spontaneus_burning; //chance for a cell to spontaneus burning
 
     double initial_burn_ratio;
@@ -69,6 +70,8 @@ ParamPtr strongParameters();
 ParamPtr funkyParameters();
 SirParamPtr easySirParameters();
 FireParamPtr easyFireParameters();
+
+double ** firePropMatrix(int * wind, double ratio);
 
 SirParamPtr stdInSIR(ParamPtr param);
 ParamPtr stdOutSIR(SirParamPtr param);

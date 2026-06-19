@@ -1,5 +1,7 @@
 #include "parameters.h"
 #include <stdlib.h>
+#include "formulas.h"
+#include <stdio.h>
 
 ParamPtr easyParameters(){
     ParamPtr param = (ParamPtr)malloc(sizeof(Parameters));
@@ -113,13 +115,32 @@ FireParamPtr easyFireParameters(){
     param->wind_direction = (int *)malloc(2*sizeof(int));
     param->wind_direction[0] = 0;
     param->wind_direction[1] = 1;
-
+    param->propagation_matrix = firePropMatrix(param->wind_direction, param->propagation_ratio); 
     param->spontaneus_burning = 0.000; //chance for a cell to spontaneus burning
 
     param->initial_burn_ratio = 0.005;
     param->initial_tree_ratio = 0.7;
 
     return param;
+}
+
+double ** firePropMatrix(int * wind, double ratio){
+    printf("prob inside %f\n", ratio);
+    double ** matrix = (double **)malloc(3 * sizeof(double *));
+    int dir[] = {-1, 0, 1};
+
+    for (int i = 0; i <3; i++){
+        matrix[i] = (double *)malloc(3 * sizeof(double));
+        for (int j = 0; j<3; j++){
+            int * vec = (int *)malloc(2*sizeof(int));
+            vec[0] = dir[j];
+            vec[1] = dir[2-i];
+            double cos = (double)(wind[0]*vec[0] + wind[1]*vec[1]) / (norm(vec) * norm(wind));
+            cos = cos*1.2 + 1.22;
+            matrix[i][j] = cos * ratio;
+        }
+    }
+    return matrix;
 }
 
 SirParamPtr stdInSIR(ParamPtr param){
