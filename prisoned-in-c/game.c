@@ -149,10 +149,13 @@ int cellFireUpdate(int row, int col, int ** initial, int ** targhet,
             int ncol = col + dir[pos/3];
             intrand = xorshift32(intrand);
             if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
-                if(initial[nrow][ncol]==1){ // near infected
+                if(initial[nrow][ncol]==2){ // near infected
                     float floatrand = (float)intrand/4294967296.0f + 0.5;
                     if(floatrand <= param->propagation_ratio){
                         targhet[row][col] = 2;
+                    }
+                    else {
+                        printf("not propagated, rand = %f soglia = %f\n", floatrand, param->propagation_ratio);
                     }
                 }
             }
@@ -242,7 +245,6 @@ int ** FireMatrixCreator(FireParamPtr param){
             intrand = xorshift32(intrand);
             float floatrand = ((float)intrand)/(4294967296.0f);
             matrix[i][j] = 0;
-            printf("%f\n", floatrand);
             if (floatrand<param->initial_tree_ratio){
                 matrix[i][j] = 1;
             }

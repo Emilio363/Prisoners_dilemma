@@ -313,10 +313,12 @@ int main(){
     float max = 0;
     float min = 1;
     for (int i = 0; i<10000; i++){
+
         intrand = xorshift32(intrand);
         float floatrand = ((float)intrand)/(4294967296.0f);
-        min = floatrand ? floatrand < min : min;
-        max = floatrand ? floatrand > max : max;
+        printf("%f\n", floatrand);
+        min = floatrand < min ? floatrand  : min;
+        max = floatrand > max ? floatrand  : max;
     }
     printf("min: %f, max: %f\n", min, max);
     float endTime = (float)clock()/3000000;
