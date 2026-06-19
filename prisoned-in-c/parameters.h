@@ -40,17 +40,39 @@ struct SIRParam
 typedef struct SIRParam SIRParameters;
 typedef struct SIRParam * SirParamPtr;
 
+struct FireParam
+{
+    int dim;
+    int max_iteration;
+    int image_proportion;
+    int image_step;
+
+    // int max_grou; //max grouth of a cell
+    // int burning_time;
+    // int burned_time;
+
+    double propagation_ratio; //chance for a cell to be burned if a neighboor is burning
+    int * wind_direction; //(-1, 0), (1, 0), (0, -1)
+// (-1, -1), (1, -1), (0, 1) (-1, 1) (1, 1)
+    double spontaneus_burning; //chance for a cell to spontaneus burning
+
+    double initial_burn_ratio;
+    double initial_tree_ratio;
+};
+
+typedef struct FireParam FireParameters;
+typedef struct FireParam * FireParamPtr;
+
 ParamPtr easyParameters();
-
 ParamPtr standardParameters();
-
 ParamPtr strongParameters();
-
 ParamPtr funkyParameters();
-
 SirParamPtr easySirParameters();
+FireParamPtr easyFireParameters();
 
 SirParamPtr stdInSIR(ParamPtr param);
-
 ParamPtr stdOutSIR(SirParamPtr param);
+FireParamPtr stdInFire(ParamPtr param);
+ParamPtr stdOutFire(FireParamPtr param);
+
 #endif

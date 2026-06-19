@@ -127,6 +127,47 @@ int cellSIRUpdate(int row, int col, int ** initial, int ** targhet,
     return 0;
 }
 
+int matrixFireUpdate(int ** initial, int ** targhet, 
+                FireParamPtr param){
+    u_int32_t intrand = xorshift32(rand());
+    for(int row = 0; row<param->dim; row++ ){
+        for(int col = 0; col<param->dim; col++){
+            intrand = xorshift32(intrand);
+            cellFireUpdate(row, col, initial, targhet, param, intrand);
+        }
+    }
+    return 0;
+}
+
+int cellFireUpdate(int row, int col, int ** initial, int ** targhet, 
+                FireParamPtr param, int intrand){
+    targhet[row][col] = initial[row][col];
+    if (initial[row][col] == 1){ // tree
+        int dir[] = {0, -1, 1};
+        for (int pos = 1; pos <9; pos++){
+            int nrow = row + dir[pos%3];
+            int ncol = col + dir[pos/3];
+            intrand = xorshift32(intrand);
+            if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
+                if(initial[nrow][ncol]==1){ // near infected
+                    float floatrand = (float)intrand/4294967296.0f + 0.5;
+                    if(floatrand <= param->propagation_ratio){
+                        targhet[row][col] = 2;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+    if (initial[row][col] == 2){ // on fire
+        targhet[row][col] = 3;
+        return 0;
+    }
+    return 0;
+
+    
+}
+
 // una funzione per trovare il colore della cella
 u_int8_t * colorOfCell(Cell_ptr player){
     return strategyColor(player->strategy);
@@ -185,6 +226,28 @@ int ** intMatrixPopulator(SirParamPtr param, int ** matrix){
             double randnum = (double)rand()/RAND_MAX;
             if(randnum < param->initial_infected_ratio){
                 matrix[i][j] = 1;
+            }
+        }
+    }
+    return matrix;
+}
+
+int ** FireMatrixCreator(FireParamPtr param){
+    int ** matrix =(int**) malloc(param->dim * sizeof(int*));
+    u_int32_t intrand = xorshift32(rand());
+    printf("tree: %f, burn: %f\n", param->initial_tree_ratio, param->initial_burn_ratio);
+    for(int i = 0; i<param->dim; i++){
+        matrix[i] = (int*) malloc(param->dim * sizeof(int));
+        for(int j = 0; j<param->dim; j++ ){
+            intrand = xorshift32(intrand);
+            float floatrand = ((float)intrand)/(4294967296.0f);
+            matrix[i][j] = 0;
+            printf("%f\n", floatrand);
+            if (floatrand<param->initial_tree_ratio){
+                matrix[i][j] = 1;
+            }
+            if (floatrand<param->initial_burn_ratio){
+                matrix[i][j] = 2;
             }
         }
     }

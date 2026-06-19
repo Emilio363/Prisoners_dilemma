@@ -308,21 +308,17 @@ int main(){
 //    ParamPtr (* parameters)() = strongParameters;
 
     float startTime = (float)clock()/3000000;
-    int intrand = xorshift32(rand());
-    float min = 1;
+
+    u_int32_t intrand = xorshift32(rand());
     float max = 0;
-    for(int i = 0; i<100; i++){
+    float min = 1;
+    for (int i = 0; i<10000; i++){
         intrand = xorshift32(intrand);
-        float floatrand = (float)intrand/4294967296.0f +0.5;
-//        fprintf(stderr, "floatrand: %f\n", floatrand);
-        if(floatrand < min){
-            min = floatrand;
-        }
-        if(floatrand > max){
-            max = floatrand;}
-                    
+        float floatrand = ((float)intrand)/(4294967296.0f);
+        min = floatrand ? floatrand < min : min;
+        max = floatrand ? floatrand > max : max;
     }
-    fprintf(stderr, "min: %f, max: %f\n", min, max);
+    printf("min: %f, max: %f\n", min, max);
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;

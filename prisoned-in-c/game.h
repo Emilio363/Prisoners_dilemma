@@ -43,6 +43,12 @@ int matrixSIRUpdate(int ** initial, int ** targhet,
 int cellSIRUpdate(int row, int col, int ** initial, int ** targhet, 
                 SirParamPtr param, int intrand);
 
+int matrixFireUpdate(int ** initial, int ** targhet, 
+                FireParamPtr param);
+
+int cellFireUpdate(int row, int col, int ** initial, int ** targhet, 
+                FireParamPtr param, int intrand);
+
 u_int8_t * colorOfCell(Cell_ptr player);
 
 Cell_ptr ** halfMatrixCreator(ParamPtr par);
@@ -52,5 +58,7 @@ Cell_ptr ** randMatrixCreator(ParamPtr param);
 int ** intMatrixCreator(ParamPtr param);
 
 int ** intMatrixPopulator(SirParamPtr param, int ** matrix);
+
+int ** FireMatrixCreator(FireParamPtr param);
 
 #endif
