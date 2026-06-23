@@ -52,8 +52,8 @@ struct FireParam
     // int burned_time;
 
     double propagation_ratio; //chance for a cell to be burned if a neighboor is burning
-    int * wind_direction; //(-1, 0), (1, 0), (0, -1)
-// (-1, -1), (1, -1), (0, 1) (-1, 1) (1, 1)
+    int * wind_direction; // West (-1, 0), Est (1, 0), South(0, -1)
+// SW (-1, -1), SE (1, -1), North (0, 1), NW (-1, 1), NE(1, 1)
     double ** propagation_matrix;
     double spontaneus_burning; //chance for a cell to spontaneus burning
 
@@ -64,12 +64,36 @@ struct FireParam
 typedef struct FireParam FireParameters;
 typedef struct FireParam * FireParamPtr;
 
+struct IsingParam
+{
+    int dim;
+    int max_iteration;
+    int image_proportion;
+    int image_step;
+
+    double temperature;      // T
+    double coupling;         // J
+    double magnetic_field;   // h
+
+    double hamiltonian;
+    int step_iteration;
+
+    double initial_ratio; // percentuale iniziale di spin +1
+    int periodic_boundary;   // 0 = aperto, 1 = periodico
+};
+
+typedef struct IsingParam IsingParameters;
+typedef struct IsingParam * IsingParamPtr;
+
+
 ParamPtr easyParameters();
 ParamPtr standardParameters();
 ParamPtr strongParameters();
 ParamPtr funkyParameters();
+
 SirParamPtr easySirParameters();
 FireParamPtr easyFireParameters();
+IsingParamPtr isingParam();
 
 double ** firePropMatrix(int * wind, double ratio);
 

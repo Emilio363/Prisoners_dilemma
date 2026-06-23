@@ -308,20 +308,6 @@ int main(){
 //    ParamPtr (* parameters)() = strongParameters;
 
     float startTime = (float)clock()/3000000;
-
-    int dir[] = {0, -1, 1};
-    int * wind = (int *)malloc(2*sizeof(int));
-    wind[0] = 1;
-    wind[1] = -1;
-    for (int pos = 1; pos <9; pos++){
-        int nrow = dir[pos%3];
-        int ncol = dir[pos/3];
-        int * vec = (int *)malloc(2*sizeof(int));
-        vec[0] = ncol;
-        vec[1] = nrow;
-        double cos = (double)(wind[0]*vec[0] + wind[1]*vec[1]) / (norm(vec) * norm(wind));
-        printf("cos %f, dir (%i, %i) \n", cos*0.8+1, vec[0], vec[1]);
-    }
     float endTime = (float)clock()/3000000;
 
     float timeElapsed1 = endTime - startTime;

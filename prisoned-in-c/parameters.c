@@ -124,8 +124,33 @@ FireParamPtr easyFireParameters(){
     return param;
 }
 
+IsingParamPtr isingParam(){
+    IsingParamPtr param = (IsingParamPtr)malloc(sizeof(IsingParameters));
+    param->dim = 20;
+    param->max_iteration = 100;
+    param->image_proportion = 4;
+    param->image_step = 100;
+
+    param->temperature = 2;      // T
+    param->coupling = 1;   // J
+    param->magnetic_field = 0;   // h
+    param->step_iteration = 100;
+    param->hamiltonian = 0;
+
+    param->initial_ratio = 0.5; // percentuale iniziale di spin +1
+    param->periodic_boundary = 0;   // 0 = aperto, 1 = periodico
+    return param;
+}
+
 double ** firePropMatrix(int * wind, double ratio){
-    printf("prob inside %f\n", ratio);
+    /* it's a 3x3 matrix with the value of fire propagation in each
+    direction. it's used cellFireUpdate
+    example:
+    with a north going wind (0,1) we evaluate the matrix:
+    [  0.7   1   0.7 ]
+    [   0   nan   0  ] * diffusion probability
+    [ -0.7  -1  -0.7 ] 
+    */
     double ** matrix = (double **)malloc(3 * sizeof(double *));
     int dir[] = {-1, 0, 1};
 
@@ -136,8 +161,10 @@ double ** firePropMatrix(int * wind, double ratio){
             vec[0] = dir[j];
             vec[1] = dir[2-i];
             double cos = (double)(wind[0]*vec[0] + wind[1]*vec[1]) / (norm(vec) * norm(wind));
-            cos = cos*1.2 + 1.22;
-            matrix[i][j] = cos * ratio;
+            // printf("x: %i, y: %i, cos: %f\n", i, j, cos);
+            cos = cos*1.22 + 1.2;
+            matrix[i][j] = cos * (ratio);
+            printf("x: %i, y: %i, cos: %f\n", i, j, matrix[i][j]);
         }
     }
     return matrix;

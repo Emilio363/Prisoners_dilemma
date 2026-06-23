@@ -1,5 +1,6 @@
 #include <stdio.h> // to debug
 #include <stdlib.h>
+#include <math.h>
 #include "game.h"
 #include "strategy.h"
 #include "formulas.h" // to debug
@@ -69,48 +70,39 @@ int _oneRandNeighbourApply(ParamPtr param, int (*fun)(Cell_ptr, Cell_ptr, ParamP
         /*
         printf("row: %i, col: %i, dx: %i, dy: %i\n", row, col, dx[dir], dy[dir]);
         printf("row: %i, col: %i, nrow: %i, ncol: %i\n", row, col, nrow, ncol);*/
-        float floatrand = (float)intrand/4294967296.0f+0.5;
+        float floatrand = (float)intrand/4294967296.0f;
         fun(Cells[row][col], Cells[nrow][ncol], param, floatrand);
     }
     return 0;
 }
 
-int matrixSIRUpdate(int ** initial, int ** targhet, 
+int matrixSIRUpdate(int ** initial, int ** target, 
                 SirParamPtr param){
     u_int32_t intrand = xorshift32(rand());
     for(int row = 0; row<param->dim; row++ ){
         for(int col = 0; col<param->dim; col++){
             intrand = xorshift32(intrand);
-            cellSIRUpdate(row, col, initial, targhet, param, intrand);
+            cellSIRUpdate(row, col, initial, target, param, intrand);
         }
     }
     return 0;
 }
 
-/*
-se sono a 0 e ho un vicino infetto, allora posso essere infettato con una certa probabilità
-se sono infetto, allora divento resistente dopo un certo numero di iterazioni
-se sono resistente, allora divento suscettibile dopo un certo numero di iterazioni
-*/
-
-int cellSIRUpdate(int row, int col, int ** initial, int ** targhet, 
-                SirParamPtr param, int intrand){
+int cellSIRUpdate(int row, int col, int ** initial, int ** target, 
+                SirParamPtr param, u_int32_t intrand){
     
-    targhet[row][col] = initial[row][col];
+    target[row][col] = initial[row][col];
     if(initial[row][col] == 0){
         int dx[] = { -1, 1, 0, 0 };  // line offset
         int dy[] = {  0, 0, -1, 1 }; // col offset
         for (int dir = 0; dir < 4; dir++) { //von newman neighboors
-            int nrow = row + dx[dir];
-            int ncol = col + dy[dir];
+            int nrow = (row + dx[dir] + param->dim)%param->dim;
+            int ncol = (col + dy[dir] + param->dim)%param->dim;
             intrand = xorshift32(intrand);
-
-            if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
-                if(initial[nrow][ncol]>0 && initial[nrow][ncol]<=param->infected_time){ // near infected
-                    float floatrand = (float)intrand/4294967296.0f + 0.5;
-                    if(floatrand <= param->propagation_ratio){ //infection
-                        targhet[row][col] = 1;
-                    }
+            if(initial[nrow][ncol]>0 && initial[nrow][ncol]<=param->infected_time){ // near infected
+                float floatrand = (float)intrand/4294967296.0f;
+                if(floatrand <= param->propagation_ratio){ //infection
+                    target[row][col] = 1;
                 }
             }
         }
@@ -118,45 +110,45 @@ int cellSIRUpdate(int row, int col, int ** initial, int ** targhet,
     }
     if (initial[row][col] == param->resistent_time){
         if(param->reinfected !=0){
-            targhet[row][col] = 0;
+            target[row][col] = 0;
             return 0;
         }
         return 0;
     }
-    targhet[row][col] = initial[row][col] + 1;
+    target[row][col] = initial[row][col] + 1;
     return 0;
 }
 
-int matrixFireUpdate(int ** initial, int ** targhet, 
+int matrixFireUpdate(int ** initial, int ** target, 
                 FireParamPtr param){
     u_int32_t intrand = xorshift32(rand());
     for(int row = 0; row<param->dim; row++ ){
         for(int col = 0; col<param->dim; col++){
             intrand = xorshift32(intrand);
-            cellFireUpdate(row, col, initial, targhet, param, intrand);
+            cellFireUpdate(row, col, initial, target, param, intrand);
         }
     }
     return 0;
 }
 
-int cellFireUpdate(int row, int col, int ** initial, int ** targhet, 
-                FireParamPtr param, int intrand){
-    targhet[row][col] = initial[row][col];
+int cellFireUpdate(int row, int col, int ** initial, int ** target, 
+                FireParamPtr param, u_int32_t intrand){
+    target[row][col] = initial[row][col];
     if (initial[row][col] == 1){ // tree
         int dir[] = {-1, 0, 1};
-        for (int i = 0; i <3; i++){
+        for (int i = 0; i <3; i++){ // moore neighboors
             for (int j = 0; j<3; j++){
-                int nrow = row + dir[j];
-                int ncol = col + dir[2-i];
+                int nrow = (row + dir[j] + param->dim)%param->dim;
+                int ncol = (col + dir[2-i] + param->dim)%param->dim;
                 intrand = xorshift32(intrand);
-                if (nrow >= 0 && nrow < param->dim && ncol >= 0 && ncol < param->dim){ // valid position
-                    if(initial[nrow][ncol]==2){ // near infected
-                        float floatrand = (float)intrand/4294967296.0f;
-                        if(floatrand <= param->propagation_matrix[i][j]){
-                            targhet[row][col] = 2;
-                        }
-                        else {
-                        }
+                if(initial[nrow][ncol]==2){ // near infected
+                    float floatrand = (float)intrand/4294967296.0f;
+                    if(floatrand <= param->propagation_matrix[i][j]){
+                        target[row][col] = 2;
+                        // printf("%i %f\n", i, floatrand);
+                    }
+                    else {
+                        // printf("x: %i, y: %i, cos: %f\n", i, j, param->propagation_matrix[i][j]);
                     }
                 }
             }
@@ -164,12 +156,64 @@ int cellFireUpdate(int row, int col, int ** initial, int ** targhet,
         return 0;
     }
     if (initial[row][col] == 2){ // on fire
-        targhet[row][col] = 3;
+        target[row][col] = 3;
         return 0;
     }
     return 0;
+}
 
+int matrixIsingUpdate(int ** initial, int ** target, 
+                IsingParamPtr param){
     
+    u_int32_t intrand = xorshift32(rand());
+    for (int i = 0; i< param->step_iteration; i++){
+        int row = intrand%param->dim;
+        int col = intrand/param->dim%param->dim;
+        cellIsingUpdate(row, col, initial, target, param, intrand);
+    }
+    return 0;
+}
+
+int cellIsingUpdate(int row, int col, int ** initial, int ** target, 
+                IsingParamPtr param, u_int32_t intrand){
+    int s = initial[row][col];
+    int neighbour_sum = 0;
+    if (param->periodic_boundary){ //periodic boundary
+        neighbour_sum =
+            initial[(row - 1 + param->dim) % param->dim][col]
+            + initial[(row + 1) % param->dim][col]
+            + initial[row][(col - 1 + param->dim) % param->dim]
+            + initial[row][(col + 1) % param->dim];
+    }
+    else{ // static boundary
+        if(row > 0) neighbour_sum += initial[row - 1][col];
+        if(row < param->dim - 1) neighbour_sum += initial[row + 1][col];
+        if(col > 0) neighbour_sum += initial[row][col - 1];
+        if(col < param->dim - 1)neighbour_sum += initial[row][col + 1];
+    }
+    double deltaE = - 2 * s * (param->coupling * neighbour_sum + param->magnetic_field);
+    
+    int accept = 0;
+
+    if(deltaE <= 0.0) {
+        accept = 1;
+    }
+    else {
+        float rnd = (float)intrand / 4294967296.0f;
+        double p = exp(-deltaE / param->temperature);
+        if(rnd < p)
+            accept = 1;
+    }
+    if(accept)
+    {
+        target[row][col] = -s;
+        initial[row][col] = -s;
+        param->hamiltonian += deltaE;
+        return 1;
+    }
+    target[row][col] = s;
+    initial[row][col] = s;
+    return 0;
 }
 
 // una funzione per trovare il colore della cella
@@ -243,7 +287,7 @@ int ** FireMatrixCreator(FireParamPtr param){
         matrix[i] = (int*) malloc(param->dim * sizeof(int));
         for(int j = 0; j<param->dim; j++ ){
             intrand = xorshift32(intrand);
-            float floatrand = ((float)intrand)/(4294967296.0f);
+            float floatrand = (float)intrand/4294967296.0f;
             matrix[i][j] = 0;
             if (floatrand<param->initial_tree_ratio){
                 matrix[i][j] = 1;
@@ -251,6 +295,61 @@ int ** FireMatrixCreator(FireParamPtr param){
             if (floatrand<param->initial_burn_ratio){
                 matrix[i][j] = 2;
             }
+        }
+    }
+    return matrix;
+}
+
+int ** isingMatrix(IsingParamPtr param){
+    int ** matrix =(int**) malloc(param->dim * sizeof(int*));
+    u_int32_t intrand = xorshift32(rand());
+    for(int i = 0; i<param->dim; i++){
+        matrix[i] = (int*) malloc(param->dim * sizeof(int));
+        for(int j = 0; j<param->dim; j++ ){
+            intrand = xorshift32(intrand);
+            float floatrand = (float)intrand/4294967296.0f;
+            matrix[i][j] = (floatrand < param->initial_ratio) ? 1 : -1;
+        }
+    }
+    double H = 0.0;
+    if (param->periodic_boundary){ // with periodic boundary
+        for(int i = 0; i < param->dim; i++)
+        {
+            for(int j = 0; j < param->dim; j++)
+            {
+                int s = matrix[i][j];
+                int right = matrix[i][(j + 1) % param->dim];
+                int down  = matrix[(i + 1) % param->dim][j];
+                H -= param->coupling * s * right;
+                H -= param->coupling * s * down;
+                H -= param->magnetic_field * s;
+            }
+        }
+    }
+    else{ // with static boundary
+        for(int i = 0; i < param->dim; i++){ 
+            for(int j = 0; j < param->dim; j++){
+                int s = matrix[i][j];
+                if(j + 1 < param->dim){
+                    H -= param->coupling * s * matrix[i][j + 1];
+                }
+                if(i + 1 < param->dim){
+                    H -= param->coupling * s * matrix[i + 1][j];
+                }
+                H -= param->magnetic_field * s;
+            }
+        }
+    }
+    param->hamiltonian = H;
+    return matrix;
+}
+
+int ** copyMatrix(int ** initial, int dim){
+    int ** matrix =(int**) malloc(dim * sizeof(int*));
+    for(int i = 0; i<dim; i++){
+        matrix[i] = (int*) malloc(dim * sizeof(int));
+        for(int j = 0; j<dim; j++ ){
+            matrix[i][j] = initial[i][j];
         }
     }
     return matrix;
